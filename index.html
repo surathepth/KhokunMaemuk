@@ -5980,13 +5980,13 @@
             return;
           }
 
-          const currentUrl = window.location.href;
-          let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/"));
+          // แก้ไขให้บังคับใช้ลิงก์ของ KhokunMaemuk เสมอ เพื่อป้องกันบั๊กเวลาชื่อร้านหายไปจากลิงก์
+          let baseUrl = "https://surathepth.github.io/KhokunMaemuk";
 
           // If running locally from file://, the customer's phone cannot access it.
           // We will default to their GitHub Pages domain for the QR Code so it works online.
-          if (currentUrl.startsWith("file://")) {
-            baseUrl = "https://surathepth.github.io/thepbotbill"; // Change to actual online domain
+          if (window.location.href.startsWith("file://")) {
+            baseUrl = "https://surathepth.github.io/thepbotbill"; // Fallback for local testing
           }
           const orderUrl = `${baseUrl}/customer_order.html?table=${encodeURIComponent(queueNo)}`;
           const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(orderUrl)}`;
