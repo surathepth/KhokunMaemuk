@@ -12434,7 +12434,7 @@
         document.getElementById('expense-total').textContent = grandTotal.toFixed(2);
       }
 
-      function saveExpense() {
+﻿      function saveExpense() {
         if (currentExpenseItems.length === 0) {
           alert('ไม่มีรายการค่าใช้จ่าย กรุณาเพิ่มรายการก่อนบันทึก');
           return;
@@ -12453,8 +12453,17 @@
           var drawer = snapshot.val();
           var currentDrawerCash = drawer ? parseFloat(drawer.amount) || 0 : 0;
           
+          // 🛠️ [Lilin Additive] Fallback to LocalStorage if Firebase returns 0 or null
+          if (currentDrawerCash === 0) {
+              var localCashStr = localStorage.getItem("thep_starting_cash_" + searchDate);
+              if (localCashStr) {
+                  currentDrawerCash = parseFloat(localCashStr) || 0;
+              }
+          }
+          
           if (currentDrawerCash < grandTotal) {
-             if(!confirm('⚠️ ยอดเงินในลิ้นชักมีไม่พอ (มีอยู่ ' + currentDrawerCash.toFixed(2) + ' บาท)\nคุณต้องการบันทึกค่าใช้จ่ายจนเงินลิ้นชักติดลบหรือไม่?')) {
+             if(!confirm('⚠️ ยอดเงินในลิ้นชักมีไม่พอ (มีอยู่ ' + currentDrawerCash.toFixed(2) + ' บาท)
+คุณต้องการบันทึกค่าใช้จ่ายจนเงินลิ้นชักติดลบหรือไม่?')) {
                  return;
              }
           }
@@ -12481,34 +12490,39 @@
           database.ref("erp_db_expenses/" + billNo).set(expenseData).then(function() {
              // Deduct from drawer cash
              var newDrawerCash = currentDrawerCash - grandTotal;
+             
+             // 🛠️ [Lilin Additive] Dual Sync: Save deduction to LocalStorage FIRST
+             localStorage.setItem("thep_starting_cash_" + searchDate, newDrawerCash);
+             
              database.ref("erp_db_drawer_cash/" + searchDate).set({
                  amount: newDrawerCash,
                  updatedAt: getLocalISOString(new Date())
              }).then(function() {
-                 alert('✅ บันทึกค่าใช้จ่ายและหักเงินจากลิ้นชักเรียบร้อยแล้ว\n(หักไป ' + grandTotal.toFixed(2) + ' บาท)');
+                 alert('✅ บันทึกค่าใช้จ่ายและหักเงินจากลิ้นชักเรียบร้อยแล้ว
+(หักไป ' + grandTotal.toFixed(2) + ' บาท)');
                  document.getElementById('expense-modal').style.display = 'none';
                  
-                 // 🛠️ [Lilin Additive 2026-08-05] Auto Sync & Jump (สลับแท็บและโชว์รายงานทันที)
-                 if (typeof switchTab === 'function') {
-                     switchTab('cashier'); // 1. วาร์ปไปแท็บแคชเชียร์
-                 }
+                 // 🛠️ [Lilin Additive] Auto-Jump and Generate Report
+                 switchTab('cashier'); // สลับไปหน้ารายงานแคชเชียร์
+                 document.getElementById('report-start-date').value = searchDate;
+                 document.getElementById('report-end-date').value = searchDate;
                  
-                 // 2. เซ็ตวันที่เป็น "วันนี้" เพื่อให้ดึงข้อมูลได้แม่นยำ
-                 var todayStr = getLocalISOString(new Date()).split('T')[0];
-                 var startDateEl = document.getElementById("report-start-date");
-                 var endDateEl = document.getElementById("report-end-date");
-                 if (startDateEl) startDateEl.value = todayStr;
-                 if (endDateEl) endDateEl.value = todayStr;
+                 // ผู้ใช้ต้องการเห็นรายงานค่าใช้จ่ายทั้งหมด (ซิงก์ภาพที่ 3)
+                 generateReport('expense'); 
                  
-                 // 3. สั่งให้ระบบสร้างรายงานค่าใช้จ่ายทันที
-                 if (typeof generateReport === 'function') {
-                     generateReport('expense');
-                 }
+                 currentExpenseItems = [];
+                 renderExpenseItems();
+             }).catch(function(err) {
+                 console.error("Drawer cash saving error:", err);
+                 alert('เกิดข้อผิดพลาดในการหักเงินจากลิ้นชัก: ' + err.message);
              });
           }).catch(function(err) {
              console.error("Expense saving error:", err);
              alert('เกิดข้อผิดพลาดในการบันทึกค่าใช้จ่าย: ' + err.message);
           });
+        }).catch(function(err) {
+           console.error("Drawer check error:", err);
+           alert('ไม่สามารถตรวจสอบยอดเงินในลิ้นชักได้: ' + err.message);
         });
       }
 
