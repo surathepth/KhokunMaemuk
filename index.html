@@ -12487,6 +12487,23 @@
              }).then(function() {
                  alert('✅ บันทึกค่าใช้จ่ายและหักเงินจากลิ้นชักเรียบร้อยแล้ว\n(หักไป ' + grandTotal.toFixed(2) + ' บาท)');
                  document.getElementById('expense-modal').style.display = 'none';
+                 
+                 // 🛠️ [Lilin Additive 2026-08-05] Auto Sync & Jump (สลับแท็บและโชว์รายงานทันที)
+                 if (typeof switchTab === 'function') {
+                     switchTab('cashier'); // 1. วาร์ปไปแท็บแคชเชียร์
+                 }
+                 
+                 // 2. เซ็ตวันที่เป็น "วันนี้" เพื่อให้ดึงข้อมูลได้แม่นยำ
+                 var todayStr = getLocalISOString(new Date()).split('T')[0];
+                 var startDateEl = document.getElementById("report-start-date");
+                 var endDateEl = document.getElementById("report-end-date");
+                 if (startDateEl) startDateEl.value = todayStr;
+                 if (endDateEl) endDateEl.value = todayStr;
+                 
+                 // 3. สั่งให้ระบบสร้างรายงานค่าใช้จ่ายทันที
+                 if (typeof generateReport === 'function') {
+                     generateReport('expense');
+                 }
              });
           }).catch(function(err) {
              console.error("Expense saving error:", err);
