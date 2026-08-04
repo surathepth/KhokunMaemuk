@@ -1,6 +1,17 @@
 <!doctype html>
 <html lang="th">
   <head>
+    <!-- สคริปต์ดักจับลูกค้าสแกน QR Code (Bridge Script) -->
+    <!-- หากพบรหัสโต๊ะ (?table=) ให้วาร์ปเชื่อมข้อมูลไปยังหน้า customer_order.html อัตโนมัติ -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tableNo = urlParams.get('table');
+        if (tableNo) {
+            window.location.href = `customer_order.html${window.location.search}`;
+        }
+      });
+    </script>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -5980,15 +5991,17 @@
             return;
           }
 
-          // แก้ไขให้บังคับใช้ลิงก์ของ KhokunMaemuk เสมอ เพื่อป้องกันบั๊กเวลาชื่อร้านหายไปจากลิงก์
+          // ตั้งค่าลิงก์ร้านค้าใหม่ให้ชี้ไปที่หน้าเว็บตรงๆ ตามแผนที่บอสอนุมัติ (เพื่อให้ได้ลิงก์ KhokunMaemuk/ ตรงๆ)
           let baseUrl = "https://surathepth.github.io/KhokunMaemuk";
+          let targetPath = "/"; // สำหรับร้านใหม่ ไม่ต้องใส่ชื่อไฟล์ เพื่อให้ลิงก์ออกมาสวยงาม
 
           // If running locally from file://, the customer's phone cannot access it.
           // We will default to their GitHub Pages domain for the QR Code so it works online.
           if (window.location.href.startsWith("file://")) {
             baseUrl = "https://surathepth.github.io/thepbotbill"; // Fallback for local testing
+            targetPath = "/customer_order.html"; // ร้านเก่ายังคงต้องชี้ไปที่ไฟล์โดยตรง
           }
-          const orderUrl = `${baseUrl}/customer_order.html?table=${encodeURIComponent(queueNo)}`;
+          const orderUrl = `${baseUrl}${targetPath}?table=${encodeURIComponent(queueNo)}`;
           const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(orderUrl)}`;
 
           let qrModalHtml = `
