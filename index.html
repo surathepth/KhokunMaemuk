@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="th">
   <head>
     <!-- สคริปต์ดักจับลูกค้าสแกน QR Code (Bridge Script) -->
@@ -12462,8 +12462,7 @@
           }
           
           if (currentDrawerCash < grandTotal) {
-             if(!confirm('⚠️ ยอดเงินในลิ้นชักมีไม่พอ (มีอยู่ ' + currentDrawerCash.toFixed(2) + ' บาท)
-คุณต้องการบันทึกค่าใช้จ่ายจนเงินลิ้นชักติดลบหรือไม่?')) {
+             if(!confirm('⚠️ ยอดเงินในลิ้นชักมีไม่พอ (มีอยู่ ' + currentDrawerCash.toFixed(2) + ' บาท)\nคุณต้องการบันทึกค่าใช้จ่ายจนเงินลิ้นชักติดลบหรือไม่?')) {
                  return;
              }
           }
@@ -12498,8 +12497,7 @@
                  amount: newDrawerCash,
                  updatedAt: getLocalISOString(new Date())
              }).then(function() {
-                 alert('✅ บันทึกค่าใช้จ่ายและหักเงินจากลิ้นชักเรียบร้อยแล้ว
-(หักไป ' + grandTotal.toFixed(2) + ' บาท)');
+                 alert('✅ บันทึกค่าใช้จ่ายและหักเงินจากลิ้นชักเรียบร้อยแล้ว\n(หักไป ' + grandTotal.toFixed(2) + ' บาท)');
                  document.getElementById('expense-modal').style.display = 'none';
                  
                  // 🛠️ [Lilin Additive] Auto-Jump and Generate Report
@@ -12707,3 +12705,4 @@
         </div>
   </body>
 </html>
+
