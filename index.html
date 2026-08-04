@@ -4,13 +4,14 @@
     <!-- สคริปต์ดักจับลูกค้าสแกน QR Code (Bridge Script) -->
     <!-- หากพบรหัสโต๊ะ (?table=) ให้วาร์ปเชื่อมข้อมูลไปยังหน้า customer_order.html อัตโนมัติ -->
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
+      // สายฟ้าแลบ: ไม่ต้องรอโหลดหน้าจอ ให้วาร์ปทันทีที่รันสคริปต์นี้ และไม่เก็บประวัติหน้า Login (replace)
+      (function() {
         const urlParams = new URLSearchParams(window.location.search);
         const tableNo = urlParams.get('table');
         if (tableNo) {
-            window.location.href = `customer_order.html${window.location.search}`;
+            window.location.replace(`customer_order.html${window.location.search}`);
         }
-      });
+      })();
     </script>
     <meta charset="UTF-8" />
     <meta
