@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="th">
   <head>
     <!-- สคริปต์ดักจับลูกค้าสแกน QR Code (Bridge Script) -->
@@ -11384,14 +11384,55 @@
         html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>4. ยอดจำนวนเงินสด ทั้งหมดจากการขาย:</strong></td><td style="text-align:right;">${netCashToSubmit.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
         
         if (isSingleDay) {
-            html += `<tr style="border-bottom: 1px solid #eee; background-color: #fff9c4;"><td><strong>5. เงินทอนตั้งต้นในลิ้นชัก (ประจำวัน):</strong></td><td style="text-align:right; color: #d35400;">${startingCash.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
+            // 🛠️ [Lilin Surgical Fix] แยกแถวค่าใช้จ่ายออกมาโชว์ (ข้อ 5.5) และฝัง ID ไว้ให้โค้ด Auto คำนวณทีหลัง
+            html += `<tr style="border-bottom: 1px solid #eee; background-color: #fff9c4;"><td><strong>5. เงินทอนตั้งต้นในลิ้นชัก (ประจำวัน):</strong></td><td style="text-align:right; color: #d35400;" id="report-starting-cash-display">${startingCash.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
+            html += `<tr style="border-bottom: 1px solid #eee; background-color: #fdebd0; display: none;" id="report-expense-row"><td style="padding-left: 20px;"><strong><i class="fas fa-minus-circle"></i> 5.5 ยอดเงินออกจากลิ้นชัก (ค่าใช้จ่าย):</strong></td><td style="text-align:right; color: #c0392b;" id="report-expense-display">0.00 บาท</td></tr>`;
+            
             html += `<tr><td colspan="2"><hr style="border: 0; border-top: 2px dashed #ccc; margin: 10px 0;"></td></tr>`;
             html += `<tr style="font-size: 16px; color: #27ae60;"><td><strong>6. ยอดจำนวนสดนำส่ง (เฉพาะยอดขายสุทธิ):</strong></td><td style="text-align:right; font-weight:bold;">${netCashToSubmit.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
-            html += `<tr style="font-size: 18px; color: #1abc9c; background-color: #e8f8f5;"><td><strong>7. เงินสดที่ต้องมีในลิ้นชักทั้งหมด (สุทธิ):</strong></td><td style="text-align:right; font-weight:bold;">${totalCashInDrawer.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
+            html += `<tr style="font-size: 18px; color: #1abc9c; background-color: #e8f8f5;"><td><strong>7. เงินสดที่ต้องมีในลิ้นชักทั้งหมด (สุทธิ):</strong></td><td style="text-align:right; font-weight:bold;" id="report-net-total-display">${totalCashInDrawer.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
+            
             window.currentExpectedCash = totalCashInDrawer;
             window.currentActualCash = null; // รีเซ็ตค่าทุกครั้งที่ดูรายงานใหม่
             
             html += `<tbody id="diffResultRows"></tbody>`;
+            
+            // 🛠️ [Lilin Surgical Fix] คำนวณหักลบอัตโนมัติ (Auto Calculate) โดยไปดึงข้อมูลค่าใช้จ่ายทั้งหมดของวันนี้มาหักลบยอดสุทธิแบบ Real-time
+            if (typeof database !== "undefined") {
+                setTimeout(function() {
+                    database.ref("erp_db_expenses").once("value").then(function(snapshot) {
+                        var exps = snapshot.val() || {};
+                        var totalExp = 0;
+                        var searchDateForExp = startDateStr; // startDateStr มาจากด้านบนของ generateReport
+                        
+                        Object.values(exps).forEach(function(e) {
+                            if (e.date && e.date.startsWith(searchDateForExp)) {
+                                totalExp += parseFloat(e.grandTotal) || 0;
+                            }
+                        });
+                        
+                        if (totalExp > 0) {
+                            // โชว์ข้อ 5.5 และอัปเดตยอด
+                            var expRow = document.getElementById("report-expense-row");
+                            var expDisplay = document.getElementById("report-expense-display");
+                            if (expRow && expDisplay) {
+                                expRow.style.display = "";
+                                expDisplay.innerHTML = "- " + totalExp.toLocaleString(undefined, { minimumFractionDigits: 2 }) + " บาท";
+                            }
+                            
+                            // หักลบจากข้อ 7 แบบ Auto!
+                            var netTotalDisplay = document.getElementById("report-net-total-display");
+                            if (netTotalDisplay) {
+                                var newNetTotal = window.currentExpectedCash - totalExp;
+                                window.currentExpectedCash = newNetTotal; // อัปเดตตัวแปรกลางเพื่อให้ปุ่ม "คำนวณส่วนต่าง" ทำงานได้ถูกต้อง
+                                netTotalDisplay.innerHTML = newNetTotal.toLocaleString(undefined, { minimumFractionDigits: 2 }) + " บาท";
+                            }
+                        }
+                    }).catch(function(err) {
+                        console.error("Error fetching expenses for Auto Calculate:", err);
+                    });
+                }, 100);
+            }
         } else {
             html += `<tr><td colspan="2"><hr style="border: 0; border-top: 2px dashed #ccc; margin: 10px 0;"></td></tr>`;
             html += `<tr style="font-size: 16px; color: #27ae60;"><td><strong>5. ยอดจำนวนสดนำส่ง (เฉพาะยอดขายสุทธิ):</strong></td><td style="text-align:right; font-weight:bold;">${netCashToSubmit.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
@@ -12487,33 +12528,24 @@
 
           // Save Expense
           database.ref("erp_db_expenses/" + billNo).set(expenseData).then(function() {
-             // Deduct from drawer cash
-             var newDrawerCash = currentDrawerCash - grandTotal;
+             // 🛠️ [Lilin Surgical Fix] STOP DEDUCTING FROM STARTING CASH
+             // เพื่อให้ข้อ 5 เงินทอนตั้งต้น มีค่าเท่าเดิม 100% ส่วนการหักค่าใช้จ่ายจะไปดึงมาจากฐานข้อมูลแสดงแบบ Auto แทนค่ะ!
+             alert('✅ บันทึกค่าใช้จ่ายลงระบบเรียบร้อยแล้ว\n(หักลบยอดสุทธิไป ' + grandTotal.toFixed(2) + ' บาท)');
+             document.getElementById('expense-modal').style.display = 'none';
+                 
+             // 🛠️ [Lilin Additive] Auto-Jump and Generate Report
+             switchTab('cashier'); // สลับไปหน้ารายงานแคชเชียร์
+             document.getElementById('report-start-date').value = searchDate;
+             document.getElementById('report-end-date').value = searchDate;
              
-             // 🛠️ [Lilin Additive] Dual Sync: Save deduction to LocalStorage FIRST
-             localStorage.setItem("thep_starting_cash_" + searchDate, newDrawerCash);
+             // ผู้ใช้ต้องการเห็นรายงานค่าใช้จ่ายทั้งหมด (ซิงก์ภาพที่ 3)
+             generateReport('expense'); 
              
-             database.ref("erp_db_drawer_cash/" + searchDate).set({
-                 amount: newDrawerCash,
-                 updatedAt: getLocalISOString(new Date())
-             }).then(function() {
-                 alert('✅ บันทึกค่าใช้จ่ายและหักเงินจากลิ้นชักเรียบร้อยแล้ว\n(หักไป ' + grandTotal.toFixed(2) + ' บาท)');
-                 document.getElementById('expense-modal').style.display = 'none';
-                 
-                 // 🛠️ [Lilin Additive] Auto-Jump and Generate Report
-                 switchTab('cashier'); // สลับไปหน้ารายงานแคชเชียร์
-                 document.getElementById('report-start-date').value = searchDate;
-                 document.getElementById('report-end-date').value = searchDate;
-                 
-                 // ผู้ใช้ต้องการเห็นรายงานค่าใช้จ่ายทั้งหมด (ซิงก์ภาพที่ 3)
-                 generateReport('expense'); 
-                 
-                 currentExpenseItems = [];
-                 renderExpenseItems();
-             }).catch(function(err) {
-                 console.error("Drawer cash saving error:", err);
-                 alert('เกิดข้อผิดพลาดในการหักเงินจากลิ้นชัก: ' + err.message);
-             });
+             // อัปเดตตารางแคชเชียร์เพื่อให้เห็น "ข้อ 5.5 ยอดเงินออกจากลิ้นชัก" อัตโนมัติ
+             generateReport('cashier');
+             
+             currentExpenseItems = [];
+             renderExpenseItems();
           }).catch(function(err) {
              console.error("Expense saving error:", err);
              alert('เกิดข้อผิดพลาดในการบันทึกค่าใช้จ่าย: ' + err.message);
