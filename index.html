@@ -5458,6 +5458,7 @@
           .getElementById("grand-total")
           .innerText.replace(/,/g, "");
         const grandTotal = parseFloat(grandTotalText) || 0;
+        
         const cashInputVal = document.getElementById("cash-input").value;
         const cashInput = parseFloat(cashInputVal) || 0;
 
@@ -5987,7 +5988,6 @@
           if (currentUrl.startsWith("file://")) {
             baseUrl = "https://surathepth.github.io/thepbotbill"; // Change to actual online domain
           }
-
           const orderUrl = `${baseUrl}/customer_order.html?table=${encodeURIComponent(queueNo)}`;
           const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(orderUrl)}`;
 
