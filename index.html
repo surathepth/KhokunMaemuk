@@ -12509,7 +12509,7 @@
           }
 
           // Generate bill number DDMMYY-HHMM
-          var now = new Date();
+          var now = getBusinessDate(); // 🛠️ [Lilin Fix] Use Business Date to align with report dates
           var dd = String(now.getDate()).padStart(2, '0');
           var mm = String(now.getMonth() + 1).padStart(2, '0');
           var yy = String(now.getFullYear()).slice(-2);
@@ -12520,7 +12520,7 @@
 
           var expenseData = {
             billNo: billNo,
-            date: getLocalISOString(now),
+            date: getLocalISOString(now), // 🛠️ Saved with Business Date context
             items: currentExpenseItems,
             grandTotal: grandTotal,
             createdBy: "แคชเชียร์"
@@ -12538,11 +12538,8 @@
              document.getElementById('report-start-date').value = searchDate;
              document.getElementById('report-end-date').value = searchDate;
              
-             // ผู้ใช้ต้องการเห็นรายงานค่าใช้จ่ายทั้งหมด (ซิงก์ภาพที่ 3)
+             // ผู้ใช้ต้องการเห็นรายงานค่าใช้จ่ายทั้งหมดแบบแสดงรายละเอียด (ตามคำขอข้อ 1.2)
              generateReport('expense'); 
-             
-             // อัปเดตตารางแคชเชียร์เพื่อให้เห็น "ข้อ 5.5 ยอดเงินออกจากลิ้นชัก" อัตโนมัติ
-             generateReport('cashier');
              
              currentExpenseItems = [];
              renderExpenseItems();
