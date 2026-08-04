@@ -6459,12 +6459,36 @@
             btn.innerText = "⏳ กำลังล้างข้อมูล...";
             btn.disabled = true;
 
-            // 🛠️ [ADDITIVE] ล้างข้อมูลฝั่ง Firebase ด้วย เพื่อให้ระบบซิงก์กลับไปเป็น 0.00 พร้อมกัน
+            // 🛠️ [Lilin ADDITIVE 2026-08-05] กวาดล้างข้อมูลทุกสรรพสิ่งให้เกลี้ยง (Total Wipe)
             if (typeof database !== "undefined") {
-              database
-                .ref("erp_db_sales")
-                .remove()
-                .catch((err) => console.error("Firebase Clear Error:", err));
+              database.ref("erp_db_sales").remove().catch((err) => console.error("Clear Sales:", err));
+              database.ref("erp_db_orders").remove().catch((err) => console.error("Clear Orders:", err));
+              database.ref("erp_db_drawer_cash").remove().catch((err) => console.error("Clear Drawer:", err));
+              database.ref("erp_db_expenses").remove().catch((err) => console.error("Clear Expenses:", err));
+            }
+
+            // ล้างข้อมูลฝั่งความจำเครื่อง (LocalStorage) ที่เกี่ยวกับแคชเชียร์และโต๊ะทั้งหมด
+            localStorage.removeItem("thep_shift_logs"); 
+            localStorage.removeItem("thep_active_bill"); 
+            localStorage.removeItem("thep_held_bills");
+            
+            // วนลูปหาและล้าง "เงินทอนตั้งต้น" ของทุกๆ วันที่ค้างอยู่
+            let keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key && key.startsWith("thep_starting_cash_")) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+            
+            // รีเซ็ตตัวแปรในหน้าจอให้กลับเป็นศูนย์ทันที (เพื่อให้หน้ารายงานแคชเชียร์หายติดลบ)
+            window.currentExpectedCash = 0;
+            if (typeof tableOrders !== "undefined") {
+               tableOrders = [];
+            }
+            if (typeof renderTableGrid === "function") {
+               renderTableGrid();
             }
 
             if (!WEB_APP_URL) {
