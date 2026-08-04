@@ -5983,8 +5983,8 @@
           // บังคับลิงก์สั่งอาหารของลูกค้า ให้ชี้ไปที่คลังของร้าน KhokunMaemuk ตรงๆ
           const baseUrl = "https://surathepth.github.io/KhokunMaemuk";
           
-          // บังคับเปลี่ยนชื่อไฟล์รับออเดอร์ลูกค้าจาก customer_order.html ให้เป็น index.html ตามที่บอสแจ้ง
-          const orderUrl = `${baseUrl}/index.html?table=${encodeURIComponent(queueNo)}`;
+          // บังคับเปลี่ยนชื่อไฟล์รับออเดอร์ลูกค้าให้เป็น customer_order.html เพื่อไม่ให้ไปเปิดชนกับหน้า Login ของแคชเชียร์
+          const orderUrl = `${baseUrl}/customer_order.html?table=${encodeURIComponent(queueNo)}`;
           const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(orderUrl)}`;
 
           let qrModalHtml = `
