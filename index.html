@@ -2051,75 +2051,6 @@
           </div>
         </div>
 
-        <!-- [Lilin Additive 2026-08-02] Modal คีย์ค่าใช้จ่าย Responsive -->
-        <div id="expense-modal" class="modal-overlay" style="z-index: 10005;">
-          <div class="modal-content" style="width: 95%; max-width: 500px">
-            <div class="modal-title">💸 คีย์ค่าใช้จ่ายแคชเชียร์</div>
-            <div style="font-size: 14px; margin-bottom: 15px; text-align: center; color: #7f8c8d;">
-              ยอดเงินจะถูกหักจากลิ้นชักทันที
-            </div>
-            
-            <div class="modal-input-group">
-              <label>รายการค่าใช้จ่าย:</label>
-              <input type="text" id="expense-name" placeholder="เช่น ค่าน้ำแข็ง, ค่าน้ำดื่ม" />
-            </div>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-              <div style="flex: 1;">
-                <label style="display: block; font-weight: bold; font-size: 12px; color: var(--text-main); margin-bottom: 5px;">จำนวน:</label>
-                <input type="number" id="expense-qty" value="1" min="1" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: 'Prompt', sans-serif;" />
-              </div>
-              <div style="flex: 1;">
-                <label style="display: block; font-weight: bold; font-size: 12px; color: var(--text-main); margin-bottom: 5px;">ราคาต่อหน่วย:</label>
-                <input type="number" id="expense-price" placeholder="0.00" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: 'Prompt', sans-serif;" />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              style="background: #3498db; color: white; width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 15px;"
-              onclick="addExpenseItem()"
-            >
-              ➕ เพิ่มรายการ
-            </button>
-
-            <div style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
-              <table id="expense-items-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                <thead style="background: #f1f2f6; position: sticky; top: 0;">
-                  <tr>
-                    <th style="padding: 5px; text-align: left;">รายการ</th>
-                    <th style="padding: 5px; text-align: center;">จำนวน</th>
-                    <th style="padding: 5px; text-align: right;">รวม</th>
-                    <th style="padding: 5px; text-align: center;">ลบ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- JS DOM Insert -->
-                </tbody>
-              </table>
-            </div>
-
-            <div style="text-align: right; font-size: 18px; font-weight: bold; color: #c0392b; margin-bottom: 15px;">
-              รวมเป็นเงิน: <span id="expense-total">0.00</span> บาท
-            </div>
-
-            <button
-              type="button"
-              class="modal-btn-save"
-              style="background: #c0392b"
-              onclick="saveExpense()"
-            >
-              💾 บันทึกค่าใช้จ่าย
-            </button>
-            <button
-              type="button"
-              class="modal-btn-cancel"
-              onclick="document.getElementById('expense-modal').style.display = 'none'"
-            >
-              ❌ ปิดหน้าต่าง
-            </button>
-          </div>
-        </div>
 
         <div
           id="held-bills-container"
@@ -12650,5 +12581,74 @@
         });
       }
     </script>
+        <!-- [Lilin Additive 2026-08-02] Modal คีย์ค่าใช้จ่าย Responsive -->
+        <div id="expense-modal" class="modal-overlay" style="z-index: 10005;">
+          <div class="modal-content" style="width: 95%; max-width: 500px">
+            <div class="modal-title">💸 คีย์ค่าใช้จ่ายแคชเชียร์</div>
+            <div style="font-size: 14px; margin-bottom: 15px; text-align: center; color: #7f8c8d;">
+              ยอดเงินจะถูกหักจากลิ้นชักทันที
+            </div>
+            
+            <div class="modal-input-group">
+              <label>รายการค่าใช้จ่าย:</label>
+              <input type="text" id="expense-name" placeholder="เช่น ค่าน้ำแข็ง, ค่าน้ำดื่ม" />
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+              <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; color: var(--text-main); margin-bottom: 5px;">จำนวน:</label>
+                <input type="number" id="expense-qty" value="1" min="1" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: 'Prompt', sans-serif;" />
+              </div>
+              <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; font-size: 12px; color: var(--text-main); margin-bottom: 5px;">ราคาต่อหน่วย:</label>
+                <input type="number" id="expense-price" placeholder="0.00" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: 'Prompt', sans-serif;" />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              style="background: #3498db; color: white; width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 15px;"
+              onclick="addExpenseItem()"
+            >
+              ➕ เพิ่มรายการ
+            </button>
+
+            <div style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;">
+              <table id="expense-items-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead style="background: #f1f2f6; position: sticky; top: 0;">
+                  <tr>
+                    <th style="padding: 5px; text-align: left;">รายการ</th>
+                    <th style="padding: 5px; text-align: center;">จำนวน</th>
+                    <th style="padding: 5px; text-align: right;">รวม</th>
+                    <th style="padding: 5px; text-align: center;">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- JS DOM Insert -->
+                </tbody>
+              </table>
+            </div>
+
+            <div style="text-align: right; font-size: 18px; font-weight: bold; color: #c0392b; margin-bottom: 15px;">
+              รวมเป็นเงิน: <span id="expense-total">0.00</span> บาท
+            </div>
+
+            <button
+              type="button"
+              class="modal-btn-save"
+              style="background: #c0392b"
+              onclick="saveExpense()"
+            >
+              💾 บันทึกค่าใช้จ่าย
+            </button>
+            <button
+              type="button"
+              class="modal-btn-cancel"
+              onclick="document.getElementById('expense-modal').style.display = 'none'"
+            >
+              ❌ ปิดหน้าต่าง
+            </button>
+          </div>
+        </div>
   </body>
 </html>
