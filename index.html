@@ -11038,12 +11038,12 @@
         let checkBillHtml = `
         <div style="text-align: center; font-family: 'Sarabun', 'Courier New', monospace; font-size: 20px; font-weight: bold; color: #000 !important; width: 100%; max-width: 100%; margin: 0; padding: 0; letter-spacing: -0.5px;">
             <h2 style="margin: 0; font-size: 30px; font-weight: 900; color: #000 !important; letter-spacing: -1px;">${sName}</h2>
-            ${sAddr ? `<div style="font-size: 16px; margin: 2px 0;">${sAddr}</div>` : ""}
-            ${sPhone ? `<div style="font-size: 16px; margin: 2px 0;">โทร: ${sPhone}</div>` : ""}
-            <div style="margin: 5px 0; font-weight: 900; font-size: 24px; white-space: nowrap;">รายการอาหารเครื่องดื่ม</div>
-            <div style="margin: 3px 0; font-size: 20px;">NO. ${billNumber}</div>
-            <div style="margin: 3px 0; font-size: 20px;">โต๊ะ: ${tableName}</div>
-            <div style="margin: 3px 0; font-size: 20px;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
+            ${sAddr ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${sAddr}</div>` : ""}
+            ${sPhone ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โทร: ${sPhone}</div>` : ""}
+            <div style="margin: 5px 0; font-weight: 900; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;รายการอาหารเครื่องดื่ม</div>
+            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO. ${billNumber}</div>
+            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
+            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
                 ${tOrders
@@ -11051,8 +11051,8 @@
                     (o) => `
                     <tr>
                         <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${o.productName || o.name || "ไม่มีชื่อสินค้า"}</td>
-                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;${o.qty}x${o.price}</td>
-                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;${(o.qty * o.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${o.qty}x${o.price}</td>
+                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${(o.qty * o.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                     </tr>
                 `,
                   )
@@ -11061,13 +11061,13 @@
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 24px;">
                 <span>ยอดรวม</span>
-                <span>${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
             </div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <div style="margin-top: 10px; font-size: 16px;">กรุณาตรวจสอบรายการก่อนชำระเงิน</div>
-            <div style="margin-top: 10px; font-weight: 900; font-size: 22px;">สแกนจ่ายด้วยพร้อมเพย์</div>
+            <div style="margin-top: 10px; font-size: 16px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;กรุณาตรวจสอบรายการก่อนชำระเงิน</div>
+            <div style="margin-top: 10px; font-weight: 900; font-size: 22px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;สแกนจ่ายด้วยพร้อมเพย์</div>
             <img src="${new URL("10001_bank.png", window.location.href).href}" style="width: 100%; max-width: 240px; margin-top: 10px;">
-            <div style="margin-top: 5px; font-weight: 900; font-size: 18px;">ชื่อบัญชี: ${ppName}</div>
+            <div style="margin-top: 5px; font-weight: 900; font-size: 18px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ชื่อบัญชี: ${ppName}</div>
         </div>
     `;
 
@@ -11108,16 +11108,16 @@
         <div style="background: #fff; width: 100%; max-width: 100%; margin: 0; padding: 0; box-sizing: border-box; color: #000 !important; font-family: 'Sarabun', 'Courier New', monospace; font-size: 20px; font-weight: bold; letter-spacing: -0.5px;">
             <div class="print-header" style="text-align: center;">
                 <h2 style="margin:0; font-size: 30px; font-weight: 900; color: #000 !important; letter-spacing: -1px;">${shopName}</h2>
-                ${shopAddress ? `<div style="font-size: 16px; margin: 2px 0;">${shopAddress}</div>` : ""}
-                ${shopPhone ? `<div style="font-size: 16px; margin: 2px 0;">โทร: ${shopPhone}</div>` : ""}
+                ${shopAddress ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${shopAddress}</div>` : ""}
+                ${shopPhone ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โทร: ${shopPhone}</div>` : ""}
                 <br>
-                <h4 style="margin:5px 0 10px 0; font-size: 24px; font-weight: 900; white-space: nowrap;">ใบเสร็จรับเงิน</h4>
+                <h4 style="margin:5px 0 10px 0; font-size: 20px; font-weight: 900; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ใบเสร็จรับเงิน</h4>
             </div>
             
-            <div style="margin: 3px 0; font-size: 20px;">NO. ${billData.billNumber}</div>
-            <div style="margin: 3px 0; font-size: 20px;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
-            <div style="margin: 3px 0; font-size: 20px;">พนักงาน: ${staffName}</div>
-            <div style="margin: 3px 0; font-size: 22px; font-weight: 900;">โต๊ะ: ${tableName}</div>
+            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO. ${billData.billNumber}</div>
+            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
+            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;พนักงาน: ${staffName}</div>
+            <div style="margin: 3px 0; font-size: 22px; font-weight: 900;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
                 ${billData.items
@@ -11125,8 +11125,8 @@
                     (item) => `
                     <tr>
                         <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${item.productName || item.name || "ไม่มีชื่อสินค้า"}</td>
-                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;${item.qty}x${item.price}</td>
-                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;${(item.qty * item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${item.qty}x${item.price}</td>
+                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${(item.qty * item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                     </tr>
                 `,
                   )
@@ -11136,20 +11136,20 @@
             <table style="width: 100%; text-align: left; font-size: 22px; font-weight: 900; color: #000 !important;">
                 <tr>
                     <td>ยอดรวม</td>
-                    <td style="text-align: right;">${billData.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                    <td style="text-align: right;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${billData.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                 </tr>
                 <tr>
                     <td>รับเงิน</td>
-                    <td style="text-align: right;">${(billData.cashInput + (billData.transferInput || 0)).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                    <td style="text-align: right;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${(billData.cashInput + (billData.transferInput || 0)).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                 </tr>
                 <tr>
                     <td>เงินทอน</td>
-                    <td style="text-align: right;">${billData.changeDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                    <td style="text-align: right;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${billData.changeDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                 </tr>
             </table>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            ${billData.transferInput > 0 && billData.cashInput === 0 ? '<div style="margin-top: 10px; font-weight: 900; font-size: 22px;">สแกนจ่ายด้วยพร้อมเพย์</div>' : ""}
-            <div style="margin-top: 20px; text-align: center; font-size: 22px; font-weight: 900;">ขอบคุณที่ใช้บริการค่ะ</div>
+            ${billData.transferInput > 0 && billData.cashInput === 0 ? '<div style="margin-top: 10px; font-weight: 900; font-size: 22px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;สแกนจ่ายด้วยพร้อมเพย์</div>' : ""}
+            <div style="margin-top: 20px; text-align: center; font-size: 22px; font-weight: 900;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ขอบคุณที่ใช้บริการค่ะ</div>
         </div>
     `;
         sunmiSilentPrint(receiptHtml);
