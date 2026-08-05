@@ -56,6 +56,11 @@
         <!-- Categories will be loaded here -->
     </div>
 
+    <!-- ADD SEARCH HERE -->
+    <div class="container px-3 mb-2">
+        <input type="text" id="customer-menu-search" class="form-control rounded-pill text-center" placeholder="🔍 ค้นหาชื่อเมนู อาหารและเครื่องดื่ม..." onkeyup="renderProducts()" style="border: 2px solid #2ecc71;">
+    </div>
+
     <div class="container mt-2" id="product-container">
         <div class="text-center mt-5">
             <div class="spinner-border text-success" role="status">
@@ -265,7 +270,14 @@
             const container = document.getElementById('product-container');
             container.innerHTML = "";
             
+            const searchInput = document.getElementById('customer-menu-search');
+            const searchQuery = searchInput ? searchInput.value.toLowerCase() : "";
+
             let filtered = currentCategory === "ทั้งหมด" ? allProducts : allProducts.filter(p => p.category === currentCategory);
+            
+            if (searchQuery) {
+                filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchQuery));
+            }
             
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="text-center mt-5 text-muted">ไม่พบรายการอาหาร</div>`;

@@ -3828,6 +3828,10 @@
               &times;
             </button>
           </div>
+          <!-- Search Bar Added by Lilin -->
+          <div style="padding: 10px; background: #fff; text-align: center; border-bottom: 1px solid #ddd;">
+             <input type="text" id="ipaq-menu-search" placeholder="🔍 ค้นหาชื่อเมนู อาหารและเครื่องดื่ม..." onkeyup="filterIpaqMenu()" style="width: 90%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 8px; border: 2px solid #3498db; outline: none;">
+          </div>
           <div class="ipaq-menu-grid" id="ipaq-menu-grid"></div>
         </div>
       </div>
@@ -9766,9 +9770,28 @@
         }
       }
 
+      function filterIpaqMenu() {
+        const query = document.getElementById("ipaq-menu-search").value.toLowerCase();
+        const items = document.querySelectorAll("#ipaq-menu-grid .ipaq-menu-item");
+        items.forEach((item) => {
+          const nameElement = item.querySelector(".ipaq-menu-item-name");
+          if (nameElement) {
+            const name = nameElement.innerText.toLowerCase();
+            if (name.includes(query)) {
+              item.style.display = "";
+            } else {
+              item.style.display = "none";
+            }
+          }
+        });
+      }
+
       function openIpaqMenuModal() {
         document.getElementById("ipaq-menu-modal-title").innerText =
           `สั่งอาหาร = ${currentIpaqTable.name}`;
+        const searchInput = document.getElementById("ipaq-menu-search");
+        if(searchInput) searchInput.value = "";
+        filterIpaqMenu();
         const grid = document.getElementById("ipaq-menu-grid");
         grid.innerHTML = "";
 
@@ -10147,9 +10170,28 @@
         }
       }
 
+      function filterIpaqMenu() {
+        const query = document.getElementById("ipaq-menu-search").value.toLowerCase();
+        const items = document.querySelectorAll("#ipaq-menu-grid .ipaq-menu-item");
+        items.forEach((item) => {
+          const nameElement = item.querySelector(".ipaq-menu-item-name");
+          if (nameElement) {
+            const name = nameElement.innerText.toLowerCase();
+            if (name.includes(query)) {
+              item.style.display = "";
+            } else {
+              item.style.display = "none";
+            }
+          }
+        });
+      }
+
       function openIpaqMenuModal() {
         document.getElementById("ipaq-menu-modal-title").innerText =
           `สั่งอาหาร = ${currentIpaqTable.name}`;
+        const searchInput = document.getElementById("ipaq-menu-search");
+        if(searchInput) searchInput.value = "";
+        filterIpaqMenu();
         const grid = document.getElementById("ipaq-menu-grid");
         grid.innerHTML = "";
 
