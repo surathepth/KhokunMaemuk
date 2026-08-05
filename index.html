@@ -10950,7 +10950,7 @@
         }
         
         // ห่อหุ้มด้วย div id="slip-print-content-sunmi" เพื่อให้ html2canvas จับภาพได้ง่ายและมีพื้นหลังสีขาว
-        printContainer.innerHTML = `<div id="slip-print-content-sunmi" style="padding: 0; background: #fff; width: 288px; margin: 0 auto; box-sizing: border-box; color: #000;">${htmlContent}</div>`;
+        printContainer.innerHTML = `<div id="slip-print-content-sunmi" style="padding: 0; background: #fff; width: 330px; margin: 0 auto; box-sizing: border-box; color: #000;">${htmlContent}</div>`;
         printContainer.style.display = "block";
 
         setTimeout(() => {
@@ -11039,11 +11039,11 @@
         <div style="text-align: center; font-family: 'Sarabun', 'Courier New', monospace; font-size: 20px; font-weight: bold; color: #000 !important; width: 100%; max-width: 100%; margin: 0; padding: 0; letter-spacing: -0.5px;">
             <h2 style="margin: 0; font-size: 30px; font-weight: 900; color: #000 !important; letter-spacing: -1px;">${sName}</h2>
             ${sAddr ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${sAddr}</div>` : ""}
-            ${sPhone ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โทร: ${sPhone}</div>` : ""}
+            ${sPhone ? `<div style="font-size: 16px; margin: 2px 0; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โทร: ${sPhone}</div>` : ""}
             <div style="margin: 5px 0; font-weight: 900; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;รายการอาหารเครื่องดื่ม</div>
             <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO. ${billNumber}</div>
             <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
-            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
+            <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
                 ${tOrders
@@ -11109,14 +11109,14 @@
             <div class="print-header" style="text-align: center;">
                 <h2 style="margin:0; font-size: 30px; font-weight: 900; color: #000 !important; letter-spacing: -1px;">${shopName}</h2>
                 ${shopAddress ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${shopAddress}</div>` : ""}
-                ${shopPhone ? `<div style="font-size: 16px; margin: 2px 0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โทร: ${shopPhone}</div>` : ""}
+                ${shopPhone ? `<div style="font-size: 16px; margin: 2px 0; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โทร: ${shopPhone}</div>` : ""}
                 <br>
                 <h4 style="margin:5px 0 10px 0; font-size: 20px; font-weight: 900; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ใบเสร็จรับเงิน</h4>
             </div>
             
             <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO. ${billData.billNumber}</div>
-            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
-            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;พนักงาน: ${staffName}</div>
+            <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
+            <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;พนักงาน: ${staffName}</div>
             <div style="margin: 3px 0; font-size: 22px; font-weight: 900;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
