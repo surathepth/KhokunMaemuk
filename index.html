@@ -11112,12 +11112,18 @@
               tOrders.forEach(o => {
                 let name = o.productName || o.name || "ไม่มีชื่อสินค้า";
                 let p = window.productDB && window.productDB[o.productId] ? window.productDB[o.productId] : (Object.values(window.productDB||{}).find(prod => prod.name === name) || {});
-                let cat = p.category || "อาหาร";
+                let cat = o.category || p.category || "";
                 
                 let qty = parseFloat(o.qty) || 1;
                 let price = parseFloat(o.price) || 0;
 
-                if (cat.includes("เครื่องดื่ม") || cat.includes("น้ำ") || cat.includes("Bar")) {
+                let isDrink = cat.includes("เครื่องดื่ม") || cat.includes("น้ำ") || cat.includes("Bar") ||
+                              name.includes("น้ำ") || name.includes("โซดา") || name.includes("เบียร์") || name.includes("ชา") || name.includes("กาแฟ") ||
+                              name.includes("coke") || name.includes("LEO") || name.includes("soda") || name.includes("โคล่า") || 
+                              name.includes("โค้ก") || name.includes("เป๊ปซี่") || name.includes("pepsi") || name.includes("สไปรท์") || 
+                              name.includes("sprite") || name.includes("ช้าง") || name.includes("สิงห์") || name.includes("heineken") || name.toLowerCase().includes("beer") || name.includes("ไวน์") || name.includes("แสงโสม") || name.includes("หงส์ทอง") || name.includes("รีเจนซี่") || name.includes("285");
+
+                if (isDrink) {
                   if (!drinkMap[name]) drinkMap[name] = { name: name, qty: 0, price: price };
                   drinkMap[name].qty += qty;
                   drinkTotal += (qty * price);
@@ -11134,6 +11140,7 @@
               
               if (drinkOrders.length > 0) {
                 html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px;">รายการ เครื่องดื่ม</div>`;
+                html += `<hr style="border-top: 2px dashed black; margin: 5px 0;">`;
                 html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
                 html += drinkOrders.map(o => `
                     <tr>
@@ -11152,6 +11159,7 @@
               if (foodOrders.length > 0) {
                 if (drinkOrders.length > 0) html += `<hr style="border-top: 2px dashed black; margin: 5px 0;">`;
                 html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px;">รายการอาหาร</div>`;
+                html += `<hr style="border-top: 2px dashed black; margin: 5px 0;">`;
                 html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
                 html += foodOrders.map(o => `
                     <tr>
@@ -11239,12 +11247,18 @@
               billData.items.forEach(item => {
                 let name = item.productName || item.name || "ไม่มีชื่อสินค้า";
                 let p = window.productDB && window.productDB[item.productId] ? window.productDB[item.productId] : (Object.values(window.productDB||{}).find(prod => prod.name === name) || {});
-                let cat = p.category || "อาหาร";
+                let cat = item.category || p.category || "";
                 
                 let qty = parseFloat(item.qty) || 1;
                 let price = parseFloat(item.price) || 0;
 
-                if (cat.includes("เครื่องดื่ม") || cat.includes("น้ำ") || cat.includes("Bar")) {
+                let isDrink = cat.includes("เครื่องดื่ม") || cat.includes("น้ำ") || cat.includes("Bar") ||
+                              name.includes("น้ำ") || name.includes("โซดา") || name.includes("เบียร์") || name.includes("ชา") || name.includes("กาแฟ") ||
+                              name.includes("coke") || name.includes("LEO") || name.includes("soda") || name.includes("โคล่า") || 
+                              name.includes("โค้ก") || name.includes("เป๊ปซี่") || name.includes("pepsi") || name.includes("สไปรท์") || 
+                              name.includes("sprite") || name.includes("ช้าง") || name.includes("สิงห์") || name.includes("heineken") || name.toLowerCase().includes("beer") || name.includes("ไวน์") || name.includes("แสงโสม") || name.includes("หงส์ทอง") || name.includes("รีเจนซี่") || name.includes("285");
+
+                if (isDrink) {
                   if (!drinkMap[name]) drinkMap[name] = { name: name, qty: 0, price: price };
                   drinkMap[name].qty += qty;
                   drinkTotal += (qty * price);
@@ -11261,6 +11275,7 @@
               
               if (drinkOrders.length > 0) {
                 html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px;">รายการ เครื่องดื่ม</div>`;
+                html += `<hr style="border-top: 2px dashed black; margin: 5px 0;">`;
                 html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
                 html += drinkOrders.map(o => `
                     <tr>
@@ -11279,6 +11294,7 @@
               if (foodOrders.length > 0) {
                 if (drinkOrders.length > 0) html += `<hr style="border-top: 2px dashed black; margin: 5px 0;">`;
                 html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px;">รายการอาหาร</div>`;
+                html += `<hr style="border-top: 2px dashed black; margin: 5px 0;">`;
                 html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
                 html += foodOrders.map(o => `
                     <tr>
