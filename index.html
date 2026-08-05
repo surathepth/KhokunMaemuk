@@ -7092,7 +7092,7 @@
           }
 
           let printHtml = `
-        <div id="slip-print-content" style="padding: 0; background: #fff; width: 100%; max-width: 100%; margin: 0; box-sizing: border-box; color: #000; font-family: 'Sarabun', 'Courier New', monospace; font-size: 18px;">
+        <div id="slip-print-content" style="padding: 0; background: #fff; width: 76mm; margin: 0 auto; box-sizing: border-box; color: #000; font-family: 'Sarabun', 'Courier New', monospace; font-size: 18px;">
             <div class="print-header" style="text-align: center;">
                 <h3 style="margin:0; font-size: 20px; font-weight:bold;">${shopName}</h3>
                 <p style="font-size: 12px; margin-bottom: 5px;">${shopAddress}</p>
@@ -10950,7 +10950,7 @@
         }
         
         // ห่อหุ้มด้วย div id="slip-print-content-sunmi" เพื่อให้ html2canvas จับภาพได้ง่ายและมีพื้นหลังสีขาว
-        printContainer.innerHTML = `<div id="slip-print-content-sunmi" style="padding: 0; background: #fff; width: 100%; max-width: 100%; margin: 0; box-sizing: border-box; color: #000;">${htmlContent}</div>`;
+        printContainer.innerHTML = `<div id="slip-print-content-sunmi" style="padding: 0; background: #fff; width: 76mm; margin: 0 auto; box-sizing: border-box; color: #000;">${htmlContent}</div>`;
         printContainer.style.display = "block";
 
         setTimeout(() => {
@@ -11040,7 +11040,7 @@
             <h2 style="margin: 0; font-size: 34px; font-weight: 900; color: #000 !important; letter-spacing: -1px;">${sName}</h2>
             ${sAddr ? `<div style="font-size: 22px; margin: 2px 0;">${sAddr}</div>` : ""}
             ${sPhone ? `<div style="font-size: 22px; margin: 2px 0;">โทร: ${sPhone}</div>` : ""}
-            <div style="margin: 5px 0; font-weight: 900; font-size: 26px; white-space: nowrap;">ใบแจ้งรายการอาหารและเครื่องดื่ม</div>
+            <div style="margin: 5px 0; font-weight: 900; font-size: 26px; white-space: nowrap;">รายการอาหารเครื่องดื่ม</div>
             <div style="margin: 3px 0; font-size: 22px;">NO. ${billNumber}</div>
             <div style="margin: 3px 0; font-size: 22px;">โต๊ะ: ${tableName}</div>
             <div style="margin: 3px 0; font-size: 22px;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
