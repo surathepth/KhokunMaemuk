@@ -74,7 +74,6 @@
     </script>
 
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
@@ -1085,7 +1084,6 @@
 
       gtag("config", "G-J2SMCM0YK3");
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   </head>
   <body>
@@ -3371,70 +3369,7 @@
                                 };
                             <\/script>
                         
-
-      // --- QZ Tray Auto-Print Engine ---
-      window.qzConnected = false;
-      function initQZ() {
-        if (!qz.websocket.isActive()) {
-          qz.websocket.connect().then(function() {
-            window.qzConnected = true;
-            console.log("QZ Tray Connected Successfully!");
-          }).catch(function(err) {
-            console.warn("QZ Tray not running. Silent print will fallback to standard Chrome dialog.", err);
-            window.qzConnected = false;
-          });
-        } else {
-          window.qzConnected = true;
-        }
-      }
-      
-      // Auto-connect on load
-      window.addEventListener('load', initQZ);
-
-      function silentPrintHTML(printerName, htmlContent) {
-        if (!window.qzConnected) {
-          console.warn("QZ Not connected, falling back to window.print()");
-          return false; // Tells caller to fallback
-        }
-        
-        qz.printers.find(printerName).then(function(foundPrinter) {
-          var config = qz.configs.create(foundPrinter, {
-            size: { width: 80, height: 297, units: 'mm' }, // Standard thermal 80mm
-            margins: { top: 0, right: 0, bottom: 0, left: 0 },
-            copies: 1
-          });
-          
-          // Using pixel printing for perfect HTML rendering on receipt
-          var data = [{
-             type: 'pixel',
-             format: 'html',
-             flavor: 'plain',
-             data: `
-               <html>
-                 <head>
-                   <style>
-                     body { font-family: 'sans-serif'; margin: 0; padding: 10px; width: 300px; }
-                   </style>
-                 </head>
-                 <body>
-                   ${htmlContent}
-                 </body>
-               </html>
-             `
-          }];
-          
-          return qz.print(config, data);
-        }).then(function() {
-          console.log("Silent Print to " + printerName + " Successful!");
-        }).catch(function(e) {
-          console.error("Silent Print Failed:", e);
-          alert("ไม่พบปริ้นเตอร์ชื่อ: " + printerName + " ในเครื่อง Windows นี้! กรุณาตรวจสอบชื่อในฐานข้อมูลให้ตรงกับชื่อปริ้นเตอร์ใน Windows");
-        });
-        
-        return true;
-      }
-
-  </body>
+</body>
                     </html>
                 `);
           printWindow.document.close();
@@ -10556,70 +10491,7 @@
                 '"></head><body style="margin:0; padding:10px;">',
             );
             printWindow.document.write(checkBillHtml);
-            printWindow.document.write("
-      // --- QZ Tray Auto-Print Engine ---
-      window.qzConnected = false;
-      function initQZ() {
-        if (!qz.websocket.isActive()) {
-          qz.websocket.connect().then(function() {
-            window.qzConnected = true;
-            console.log("QZ Tray Connected Successfully!");
-          }).catch(function(err) {
-            console.warn("QZ Tray not running. Silent print will fallback to standard Chrome dialog.", err);
-            window.qzConnected = false;
-          });
-        } else {
-          window.qzConnected = true;
-        }
-      }
-      
-      // Auto-connect on load
-      window.addEventListener('load', initQZ);
-
-      function silentPrintHTML(printerName, htmlContent) {
-        if (!window.qzConnected) {
-          console.warn("QZ Not connected, falling back to window.print()");
-          return false; // Tells caller to fallback
-        }
-        
-        qz.printers.find(printerName).then(function(foundPrinter) {
-          var config = qz.configs.create(foundPrinter, {
-            size: { width: 80, height: 297, units: 'mm' }, // Standard thermal 80mm
-            margins: { top: 0, right: 0, bottom: 0, left: 0 },
-            copies: 1
-          });
-          
-          // Using pixel printing for perfect HTML rendering on receipt
-          var data = [{
-             type: 'pixel',
-             format: 'html',
-             flavor: 'plain',
-             data: `
-               <html>
-                 <head>
-                   <style>
-                     body { font-family: 'sans-serif'; margin: 0; padding: 10px; width: 300px; }
-                   </style>
-                 </head>
-                 <body>
-                   ${htmlContent}
-                 </body>
-               </html>
-             `
-          }];
-          
-          return qz.print(config, data);
-        }).then(function() {
-          console.log("Silent Print to " + printerName + " Successful!");
-        }).catch(function(e) {
-          console.error("Silent Print Failed:", e);
-          alert("ไม่พบปริ้นเตอร์ชื่อ: " + printerName + " ในเครื่อง Windows นี้! กรุณาตรวจสอบชื่อในฐานข้อมูลให้ตรงกับชื่อปริ้นเตอร์ใน Windows");
-        });
-        
-        return true;
-      }
-
-  </body></html>");
+            printWindow.document.write("</body></html>");
             printWindow.document.close();
             printWindow.focus();
             setTimeout(() => {
@@ -11019,70 +10891,7 @@
                 '"></head><body style="margin:0; padding:10px;">',
             );
             printWindow.document.write(checkBillHtml);
-            printWindow.document.write("
-      // --- QZ Tray Auto-Print Engine ---
-      window.qzConnected = false;
-      function initQZ() {
-        if (!qz.websocket.isActive()) {
-          qz.websocket.connect().then(function() {
-            window.qzConnected = true;
-            console.log("QZ Tray Connected Successfully!");
-          }).catch(function(err) {
-            console.warn("QZ Tray not running. Silent print will fallback to standard Chrome dialog.", err);
-            window.qzConnected = false;
-          });
-        } else {
-          window.qzConnected = true;
-        }
-      }
-      
-      // Auto-connect on load
-      window.addEventListener('load', initQZ);
-
-      function silentPrintHTML(printerName, htmlContent) {
-        if (!window.qzConnected) {
-          console.warn("QZ Not connected, falling back to window.print()");
-          return false; // Tells caller to fallback
-        }
-        
-        qz.printers.find(printerName).then(function(foundPrinter) {
-          var config = qz.configs.create(foundPrinter, {
-            size: { width: 80, height: 297, units: 'mm' }, // Standard thermal 80mm
-            margins: { top: 0, right: 0, bottom: 0, left: 0 },
-            copies: 1
-          });
-          
-          // Using pixel printing for perfect HTML rendering on receipt
-          var data = [{
-             type: 'pixel',
-             format: 'html',
-             flavor: 'plain',
-             data: `
-               <html>
-                 <head>
-                   <style>
-                     body { font-family: 'sans-serif'; margin: 0; padding: 10px; width: 300px; }
-                   </style>
-                 </head>
-                 <body>
-                   ${htmlContent}
-                 </body>
-               </html>
-             `
-          }];
-          
-          return qz.print(config, data);
-        }).then(function() {
-          console.log("Silent Print to " + printerName + " Successful!");
-        }).catch(function(e) {
-          console.error("Silent Print Failed:", e);
-          alert("ไม่พบปริ้นเตอร์ชื่อ: " + printerName + " ในเครื่อง Windows นี้! กรุณาตรวจสอบชื่อในฐานข้อมูลให้ตรงกับชื่อปริ้นเตอร์ใน Windows");
-        });
-        
-        return true;
-      }
-
-  </body></html>");
+            printWindow.document.write("</body></html>");
             printWindow.document.close();
             printWindow.focus();
             setTimeout(() => {
@@ -11146,57 +10955,7 @@
             <div style="margin-top: 20px;">ขอบคุณที่ใช้บริการค่ะ</div>
         </div>
     `;
-
-        // 1. สั่งพิมพ์บิลใบเสร็จไปที่แคชเชียร์
-        sunmiSilentPrint(receiptHtml, false);
-        
-        // 2. ตรวจสอบว่ามีรายการอาหารหรือเครื่องดื่มเพื่อสั่งพิมพ์เข้าครัวหรือไม่
-        let kitchenPrinter = null;
-        if (window.erpData && window.erpData["printer"]) {
-            let prns = Object.values(window.erpData["printer"]);
-            let p = prns.find(prn => prn.role && (prn.role.includes("Kitchen") || prn.role.includes("ครัว")));
-            if(p) kitchenPrinter = p.id;
-        }
-
-        // ถ้ามีปริ้นเตอร์ครัวที่ตั้งค่าไว้ และเปิดใช้งาน QZ Tray ให้ส่งพิมพ์ออเดอร์เข้าครัวด้วย
-        if (kitchenPrinter && window.qzConnected) {
-            let kitchenHtml = `
-            <div style="background: #fff; width: 100%; max-width: 100%; margin: 0; padding: 0; box-sizing: border-box; color: #000 !important; font-family: 'Sarabun', 'Courier New', monospace; font-size: 20px; font-weight: bold; letter-spacing: -0.5px;">
-                <div class="print-header" style="text-align: center;">
-                    <h2 style="margin:0; font-size: 30px; font-weight: 900; color: #000 !important;">ใบสั่งอาหาร (เข้าครัว)</h2>
-                    <br>
-                </div>
-                <div style="margin: 3px 0; font-size: 20px;">NO. ${billData.billNumber}</div>
-                <div style="margin: 3px 0; font-size: 20px;">เวลา: ${new Date().toLocaleTimeString("th-TH")}</div>
-                <div style="margin: 5px 0; font-size: 32px; font-weight: 900; line-height: 1.2;">โต๊ะ: ${tableName}</div>
-                <hr style="border-top: 2px dashed black; margin: 5px 0;">
-                <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">
-            `;
-            
-            let allOrders = billData.items; // Send everything to kitchen for now
-            kitchenHtml += allOrders.map(o => {
-                let name = o.productName || o.name || "ไม่มีชื่อสินค้า";
-                return `
-                <tr>
-                    <td style="width: 70%; padding: 5px 0; word-break: break-word; white-space: normal; vertical-align: top;">${name}</td>
-                    <td style="width: 30%; text-align: right; padding: 5px 0; vertical-align: top; font-size: 24px;">x${o.qty}</td>
-                </tr>
-                `;
-            }).join("");
-            
-            kitchenHtml += `
-                </table>
-                <hr style="border-top: 2px dashed black; margin: 5px 0;">
-                <div style="text-align: center; margin-top: 10px;">(ส่งครัว)</div>
-            </div>
-            `;
-            
-            // Wait 1 second before sending to kitchen to avoid buffer collision in QZ if using same port temporarily
-            setTimeout(() => {
-                sunmiSilentPrint(kitchenHtml, true);
-            }, 1000);
-        }
-
+        sunmiSilentPrint(receiptHtml);
       }
       // --- END UNIT PRICE UPDATE PATCH ---
 
@@ -11209,36 +10968,7 @@
       // Helper to generate Auto Run Bill Number
 
       // --- SUNMI SILENT PRINT LOGIC ---
-
-      // Helper function to find printer by role
-      function getPrinterNameByRole(targetRole) {
-        if (window.erpData && window.erpData["printer"]) {
-            let prns = Object.values(window.erpData["printer"]);
-            let p = prns.find(prn => prn.role && prn.role.includes(targetRole));
-            return p ? p.id : null; // p.id is the printer name typed by user
-        }
-        return null;
-      }
-
-      function sunmiSilentPrint(htmlContent, isKitchenSlip = false) {
-        let printerName = null;
-        if (isKitchenSlip) {
-            printerName = getPrinterNameByRole("Kitchen") || getPrinterNameByRole("ครัว");
-        } else {
-            printerName = getPrinterNameByRole("แคชเชียร์");
-        }
-
-        // 0. Try QZ Tray (Auto-Print without dialog)
-        if (window.qzConnected && typeof silentPrintHTML === 'function') {
-            if (printerName) {
-                // Return immediately so we don't fall back to Android/Browser dialogs
-                silentPrintHTML(printerName, htmlContent);
-                return;
-            } else {
-                console.warn("QZ Tray Connected, but no printer configured for this role! Falling back to default...");
-            }
-        }
-
+      function sunmiSilentPrint(htmlContent) {
         // 1. ลองเจาะลึกผ่าน Sunmi JS Bridge (แกนกลางฮาร์ดแวร์โดยตรง พิมพ์เงียบ + เด้งลิ้นชัก)
         if (window.sunmi && typeof window.sunmi.printHtml === 'function') {
             try {
@@ -11602,57 +11332,7 @@
             <div style="margin-top: 20px; text-align: center; font-size: 22px; font-weight: 900;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ขอบคุณที่ใช้บริการค่ะ</div>
         </div>
     `;
-
-        // 1. สั่งพิมพ์บิลใบเสร็จไปที่แคชเชียร์
-        sunmiSilentPrint(receiptHtml, false);
-        
-        // 2. ตรวจสอบว่ามีรายการอาหารหรือเครื่องดื่มเพื่อสั่งพิมพ์เข้าครัวหรือไม่
-        let kitchenPrinter = null;
-        if (window.erpData && window.erpData["printer"]) {
-            let prns = Object.values(window.erpData["printer"]);
-            let p = prns.find(prn => prn.role && (prn.role.includes("Kitchen") || prn.role.includes("ครัว")));
-            if(p) kitchenPrinter = p.id;
-        }
-
-        // ถ้ามีปริ้นเตอร์ครัวที่ตั้งค่าไว้ และเปิดใช้งาน QZ Tray ให้ส่งพิมพ์ออเดอร์เข้าครัวด้วย
-        if (kitchenPrinter && window.qzConnected) {
-            let kitchenHtml = `
-            <div style="background: #fff; width: 100%; max-width: 100%; margin: 0; padding: 0; box-sizing: border-box; color: #000 !important; font-family: 'Sarabun', 'Courier New', monospace; font-size: 20px; font-weight: bold; letter-spacing: -0.5px;">
-                <div class="print-header" style="text-align: center;">
-                    <h2 style="margin:0; font-size: 30px; font-weight: 900; color: #000 !important;">ใบสั่งอาหาร (เข้าครัว)</h2>
-                    <br>
-                </div>
-                <div style="margin: 3px 0; font-size: 20px;">NO. ${billData.billNumber}</div>
-                <div style="margin: 3px 0; font-size: 20px;">เวลา: ${new Date().toLocaleTimeString("th-TH")}</div>
-                <div style="margin: 5px 0; font-size: 32px; font-weight: 900; line-height: 1.2;">โต๊ะ: ${tableName}</div>
-                <hr style="border-top: 2px dashed black; margin: 5px 0;">
-                <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">
-            `;
-            
-            let allOrders = billData.items; // Send everything to kitchen for now
-            kitchenHtml += allOrders.map(o => {
-                let name = o.productName || o.name || "ไม่มีชื่อสินค้า";
-                return `
-                <tr>
-                    <td style="width: 70%; padding: 5px 0; word-break: break-word; white-space: normal; vertical-align: top;">${name}</td>
-                    <td style="width: 30%; text-align: right; padding: 5px 0; vertical-align: top; font-size: 24px;">x${o.qty}</td>
-                </tr>
-                `;
-            }).join("");
-            
-            kitchenHtml += `
-                </table>
-                <hr style="border-top: 2px dashed black; margin: 5px 0;">
-                <div style="text-align: center; margin-top: 10px;">(ส่งครัว)</div>
-            </div>
-            `;
-            
-            // Wait 1 second before sending to kitchen to avoid buffer collision in QZ if using same port temporarily
-            setTimeout(() => {
-                sunmiSilentPrint(kitchenHtml, true);
-            }, 1000);
-        }
-
+        sunmiSilentPrint(receiptHtml);
       }
 
       // Override ipaqPayBill to inject auto generated bill number
@@ -13253,69 +12933,6 @@
             </button>
           </div>
         </div>
-  
-      // --- QZ Tray Auto-Print Engine ---
-      window.qzConnected = false;
-      function initQZ() {
-        if (!qz.websocket.isActive()) {
-          qz.websocket.connect().then(function() {
-            window.qzConnected = true;
-            console.log("QZ Tray Connected Successfully!");
-          }).catch(function(err) {
-            console.warn("QZ Tray not running. Silent print will fallback to standard Chrome dialog.", err);
-            window.qzConnected = false;
-          });
-        } else {
-          window.qzConnected = true;
-        }
-      }
-      
-      // Auto-connect on load
-      window.addEventListener('load', initQZ);
-
-      function silentPrintHTML(printerName, htmlContent) {
-        if (!window.qzConnected) {
-          console.warn("QZ Not connected, falling back to window.print()");
-          return false; // Tells caller to fallback
-        }
-        
-        qz.printers.find(printerName).then(function(foundPrinter) {
-          var config = qz.configs.create(foundPrinter, {
-            size: { width: 80, height: 297, units: 'mm' }, // Standard thermal 80mm
-            margins: { top: 0, right: 0, bottom: 0, left: 0 },
-            copies: 1
-          });
-          
-          // Using pixel printing for perfect HTML rendering on receipt
-          var data = [{
-             type: 'pixel',
-             format: 'html',
-             flavor: 'plain',
-             data: `
-               <html>
-                 <head>
-                   <style>
-                     body { font-family: 'sans-serif'; margin: 0; padding: 10px; width: 300px; }
-                   </style>
-                 </head>
-                 <body>
-                   ${htmlContent}
-                 </body>
-               </html>
-             `
-          }];
-          
-          return qz.print(config, data);
-        }).then(function() {
-          console.log("Silent Print to " + printerName + " Successful!");
-        }).catch(function(e) {
-          console.error("Silent Print Failed:", e);
-          alert("ไม่พบปริ้นเตอร์ชื่อ: " + printerName + " ในเครื่อง Windows นี้! กรุณาตรวจสอบชื่อในฐานข้อมูลให้ตรงกับชื่อปริ้นเตอร์ใน Windows");
-        });
-        
-        return true;
-      }
-
   </body>
 </html>
 
