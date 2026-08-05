@@ -11051,8 +11051,8 @@
                     (o) => `
                     <tr>
                         <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${o.productName || o.name || "ไม่มีชื่อสินค้า"}</td>
-                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">${o.qty}x${o.price}</td>
-                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">${(o.qty * o.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;${o.qty}x${o.price}</td>
+                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;${(o.qty * o.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                     </tr>
                 `,
                   )
@@ -11125,8 +11125,8 @@
                     (item) => `
                     <tr>
                         <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${item.productName || item.name || "ไม่มีชื่อสินค้า"}</td>
-                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">${item.qty}x${item.price}</td>
-                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">${(item.qty * item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;${item.qty}x${item.price}</td>
+                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;${(item.qty * item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                     </tr>
                 `,
                   )
