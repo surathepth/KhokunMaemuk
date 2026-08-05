@@ -7092,12 +7092,12 @@
           }
 
           let printHtml = `
-        <div id="slip-print-content" style="padding: 0; background: #fff; width: 76mm; margin: 0 auto; box-sizing: border-box; color: #000; font-family: 'Sarabun', 'Courier New', monospace; font-size: 18px;">
+        <div id="slip-print-content" style="padding: 0; background: #fff; width: 576px; margin: 0 auto; box-sizing: border-box; color: #000; font-family: 'Sarabun', 'Courier New', monospace; font-size: 36px;">
             <div class="print-header" style="text-align: center;">
-                <h3 style="margin:0; font-size: 20px; font-weight:bold;">${shopName}</h3>
-                <p style="font-size: 12px; margin-bottom: 5px;">${shopAddress}</p>
+                <h3 style="margin:0; font-size: 40px; font-weight:bold;">${shopName}</h3>
+                <p style="font-size: 24px; margin-bottom: 5px;">${shopAddress}</p>
                 <br>
-                <h4 style="margin:5px 0 10px 0; font-size: 16px; font-weight: bold; white-space: nowrap;">ใบแสดงรายการอาหารและเครื่องดื่ม</h4>
+                <h4 style="margin:5px 0 10px 0; font-size: 32px; font-weight: bold; white-space: nowrap;">รายการอาหารเครื่องดื่ม</h4>
             </div>
             
             <div style="margin: 3px 0;">NO. ${billNum}</div>
@@ -10950,7 +10950,7 @@
         }
         
         // ห่อหุ้มด้วย div id="slip-print-content-sunmi" เพื่อให้ html2canvas จับภาพได้ง่ายและมีพื้นหลังสีขาว
-        printContainer.innerHTML = `<div id="slip-print-content-sunmi" style="padding: 0; background: #fff; width: 76mm; margin: 0 auto; box-sizing: border-box; color: #000;">${htmlContent}</div>`;
+        printContainer.innerHTML = `<div id="slip-print-content-sunmi" style="padding: 0; background: #fff; width: 576px; margin: 0 auto; box-sizing: border-box; color: #000;">${htmlContent}</div>`;
         printContainer.style.display = "block";
 
         setTimeout(() => {
@@ -11036,16 +11036,16 @@
         let sPhone = shopInfo.phone1 || "";
 
         let checkBillHtml = `
-        <div style="text-align: center; font-family: 'Sarabun', 'Courier New', monospace; font-size: 22px; font-weight: bold; color: #000 !important; width: 100%; max-width: 100%; margin: 0; padding: 0; letter-spacing: -0.5px;">
-            <h2 style="margin: 0; font-size: 34px; font-weight: 900; color: #000 !important; letter-spacing: -1px;">${sName}</h2>
-            ${sAddr ? `<div style="font-size: 22px; margin: 2px 0;">${sAddr}</div>` : ""}
-            ${sPhone ? `<div style="font-size: 22px; margin: 2px 0;">โทร: ${sPhone}</div>` : ""}
-            <div style="margin: 5px 0; font-weight: 900; font-size: 26px; white-space: nowrap;">รายการอาหารเครื่องดื่ม</div>
-            <div style="margin: 3px 0; font-size: 22px;">NO. ${billNumber}</div>
-            <div style="margin: 3px 0; font-size: 22px;">โต๊ะ: ${tableName}</div>
-            <div style="margin: 3px 0; font-size: 22px;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
+        <div style="text-align: center; font-family: 'Sarabun', 'Courier New', monospace; font-size: 40px; font-weight: bold; color: #000 !important; width: 100%; max-width: 100%; margin: 0; padding: 0; letter-spacing: -1px;">
+            <h2 style="margin: 0; font-size: 60px; font-weight: 900; color: #000 !important; letter-spacing: -2px;">${sName}</h2>
+            ${sAddr ? `<div style="font-size: 40px; margin: 2px 0;">${sAddr}</div>` : ""}
+            ${sPhone ? `<div style="font-size: 40px; margin: 2px 0;">โทร: ${sPhone}</div>` : ""}
+            <div style="margin: 5px 0; font-weight: 900; font-size: 48px; white-space: nowrap;">รายการอาหารเครื่องดื่ม</div>
+            <div style="margin: 3px 0; font-size: 40px;">NO. ${billNumber}</div>
+            <div style="margin: 3px 0; font-size: 40px;">โต๊ะ: ${tableName}</div>
+            <div style="margin: 3px 0; font-size: 40px;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <table style="width: 100%; text-align: left; font-size: 22px; font-weight: bold; color: #000 !important; table-layout: fixed;">
+            <table style="width: 100%; text-align: left; font-size: 40px; font-weight: bold; color: #000 !important; table-layout: fixed;">
                 ${tOrders
                   .map(
                     (o) => `
@@ -11059,15 +11059,15 @@
                   .join("")}
             </table>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 26px;">
+            <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 48px;">
                 <span>ยอดรวม</span>
                 <span>${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
             </div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <div style="margin-top: 10px; font-size: 22px;">กรุณาตรวจสอบรายการก่อนชำระเงิน</div>
-            <div style="margin-top: 10px; font-weight: 900; font-size: 24px;">สแกนจ่ายด้วยพร้อมเพย์</div>
-            <img src="${new URL("10001_bank.png", window.location.href).href}" style="width: 100%; max-width: 320px; margin-top: 10px;">
-            <div style="margin-top: 5px; font-weight: 900; font-size: 22px;">ชื่อบัญชี: ${ppName}</div>
+            <div style="margin-top: 10px; font-size: 40px;">กรุณาตรวจสอบรายการก่อนชำระเงิน</div>
+            <div style="margin-top: 10px; font-weight: 900; font-size: 44px;">สแกนจ่ายด้วยพร้อมเพย์</div>
+            <img src="${new URL("10001_bank.png", window.location.href).href}" style="width: 100%; max-width: 480px; margin-top: 10px;">
+            <div style="margin-top: 5px; font-weight: 900; font-size: 40px;">ชื่อบัญชี: ${ppName}</div>
         </div>
     `;
 
@@ -11105,21 +11105,21 @@
         tableName = tableName.replace(/^โต๊ะ\s*/, "").replace(/^Table\s*/i, "");
 
         let receiptHtml = `
-        <div style="background: #fff; width: 100%; max-width: 100%; margin: 0; padding: 0; box-sizing: border-box; color: #000 !important; font-family: 'Sarabun', 'Courier New', monospace; font-size: 22px; font-weight: bold; letter-spacing: -0.5px;">
+        <div style="background: #fff; width: 100%; max-width: 100%; margin: 0; padding: 0; box-sizing: border-box; color: #000 !important; font-family: 'Sarabun', 'Courier New', monospace; font-size: 40px; font-weight: bold; letter-spacing: -1px;">
             <div class="print-header" style="text-align: center;">
-                <h2 style="margin:0; font-size: 34px; font-weight: 900; color: #000 !important; letter-spacing: -1px;">${shopName}</h2>
-                ${shopAddress ? `<div style="font-size: 22px; margin: 2px 0;">${shopAddress}</div>` : ""}
-                ${shopPhone ? `<div style="font-size: 22px; margin: 2px 0;">โทร: ${shopPhone}</div>` : ""}
+                <h2 style="margin:0; font-size: 60px; font-weight: 900; color: #000 !important; letter-spacing: -2px;">${shopName}</h2>
+                ${shopAddress ? `<div style="font-size: 40px; margin: 2px 0;">${shopAddress}</div>` : ""}
+                ${shopPhone ? `<div style="font-size: 40px; margin: 2px 0;">โทร: ${shopPhone}</div>` : ""}
                 <br>
-                <h4 style="margin:5px 0 10px 0; font-size: 26px; font-weight: 900; white-space: nowrap;">ใบเสร็จรับเงิน</h4>
+                <h4 style="margin:5px 0 10px 0; font-size: 48px; font-weight: 900; white-space: nowrap;">ใบเสร็จรับเงิน</h4>
             </div>
             
-            <div style="margin: 3px 0; font-size: 22px;">NO. ${billData.billNumber}</div>
-            <div style="margin: 3px 0; font-size: 22px;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
-            <div style="margin: 3px 0; font-size: 22px;">พนักงาน: ${staffName}</div>
-            <div style="margin: 3px 0; font-size: 24px; font-weight: 900;">โต๊ะ: ${tableName}</div>
+            <div style="margin: 3px 0; font-size: 40px;">NO. ${billData.billNumber}</div>
+            <div style="margin: 3px 0; font-size: 40px;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
+            <div style="margin: 3px 0; font-size: 40px;">พนักงาน: ${staffName}</div>
+            <div style="margin: 3px 0; font-size: 44px; font-weight: 900;">โต๊ะ: ${tableName}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <table style="width: 100%; text-align: left; font-size: 22px; font-weight: bold; color: #000 !important; table-layout: fixed;">
+            <table style="width: 100%; text-align: left; font-size: 40px; font-weight: bold; color: #000 !important; table-layout: fixed;">
                 ${billData.items
                   .map(
                     (item) => `
@@ -11133,7 +11133,7 @@
                   .join("")}
             </table>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <table style="width: 100%; text-align: left; font-size: 24px; font-weight: 900; color: #000 !important;">
+            <table style="width: 100%; text-align: left; font-size: 44px; font-weight: 900; color: #000 !important;">
                 <tr>
                     <td>ยอดรวม</td>
                     <td style="text-align: right;">${billData.grandTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
@@ -11148,8 +11148,8 @@
                 </tr>
             </table>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            ${billData.transferInput > 0 && billData.cashInput === 0 ? '<div style="margin-top: 10px; font-weight: 900; font-size: 24px;">สแกนจ่ายด้วยพร้อมเพย์</div>' : ""}
-            <div style="margin-top: 20px; text-align: center; font-size: 24px; font-weight: 900;">ขอบคุณที่ใช้บริการค่ะ</div>
+            ${billData.transferInput > 0 && billData.cashInput === 0 ? '<div style="margin-top: 10px; font-weight: 900; font-size: 44px;">สแกนจ่ายด้วยพร้อมเพย์</div>' : ""}
+            <div style="margin-top: 20px; text-align: center; font-size: 44px; font-weight: 900;">ขอบคุณที่ใช้บริการค่ะ</div>
         </div>
     `;
         sunmiSilentPrint(receiptHtml);
