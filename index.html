@@ -11103,19 +11103,55 @@
             <div style="margin: 5px 0; font-size: 32px; font-weight: 900; line-height: 1.2;">&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
             <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
-                ${tOrders
-                  .map(
-                    (o) => `
+            ${(() => {
+              let drinkOrders = [];
+              let foodOrders = [];
+              let drinkTotal = 0;
+              let foodTotal = 0;
+              tOrders.forEach(o => {
+                let p = window.productDB && window.productDB[o.productId] ? window.productDB[o.productId] : (Object.values(window.productDB||{}).find(prod => prod.name === o.productName) || {});
+                let cat = p.category || "อาหาร";
+                if (cat.includes("เครื่องดื่ม") || cat.includes("น้ำ") || cat.includes("Bar")) {
+                  drinkOrders.push(o);
+                  drinkTotal += (o.qty * o.price);
+                } else {
+                  foodOrders.push(o);
+                  foodTotal += (o.qty * o.price);
+                }
+              });
+
+              let html = "";
+              
+              if (drinkOrders.length > 0) {
+                html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px; border-bottom: 1px solid #000; display: inline-block;">รายการเครื่องดื่ม</div>`;
+                html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
+                html += drinkOrders.map(o => `
                     <tr>
                         <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${o.productName || o.name || "ไม่มีชื่อสินค้า"}</td>
                         <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${o.qty}x${o.price}</td>
                         <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${(o.qty * o.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                     </tr>
-                `,
-                  )
-                  .join("")}
-            </table>
+                `).join("");
+                html += `</table>`;
+                html += `<div style="text-align: right; font-weight: bold; font-size: 20px; margin-top: 5px; margin-bottom: 10px;">ยอดรวมสรุปทั้งสิ้นท้ายชื่อ รายการเครื่องดื่ม: ${(drinkTotal).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>`;
+              }
+
+              if (foodOrders.length > 0) {
+                html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px; border-bottom: 1px solid #000; display: inline-block;">รายการอาหาร</div>`;
+                html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
+                html += foodOrders.map(o => `
+                    <tr>
+                        <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${o.productName || o.name || "ไม่มีชื่อสินค้า"}</td>
+                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${o.qty}x${o.price}</td>
+                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${(o.qty * o.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                    </tr>
+                `).join("");
+                html += `</table>`;
+                html += `<div style="text-align: right; font-weight: bold; font-size: 20px; margin-top: 5px; margin-bottom: 5px;">ยอดรวมสรุปทั้งสิ้นท้ายชื่อ รายการอาหาร: ${(foodTotal).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>`;
+              }
+
+              return html;
+            })()}
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <div style="display: flex; justify-content: space-between; font-weight: 900; font-size: 24px;">
                 <span>ยอดรวม</span>
@@ -11177,19 +11213,55 @@
             <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;พนักงาน: ${staffName}</div>
             <div style="margin: 5px 0; font-size: 32px; font-weight: 900; line-height: 1.2;">&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
-            <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
-                ${billData.items
-                  .map(
-                    (item) => `
+            ${(() => {
+              let drinkOrders = [];
+              let foodOrders = [];
+              let drinkTotal = 0;
+              let foodTotal = 0;
+              billData.items.forEach(item => {
+                let p = window.productDB && window.productDB[item.productId] ? window.productDB[item.productId] : (Object.values(window.productDB||{}).find(prod => prod.name === item.productName) || {});
+                let cat = p.category || "อาหาร";
+                if (cat.includes("เครื่องดื่ม") || cat.includes("น้ำ") || cat.includes("Bar")) {
+                  drinkOrders.push(item);
+                  drinkTotal += (item.qty * item.price);
+                } else {
+                  foodOrders.push(item);
+                  foodTotal += (item.qty * item.price);
+                }
+              });
+
+              let html = "";
+              
+              if (drinkOrders.length > 0) {
+                html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px; border-bottom: 1px solid #000; display: inline-block;">รายการเครื่องดื่ม</div>`;
+                html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
+                html += drinkOrders.map(item => `
                     <tr>
                         <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${item.productName || item.name || "ไม่มีชื่อสินค้า"}</td>
                         <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${item.qty}x${item.price}</td>
                         <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${(item.qty * item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
                     </tr>
-                `,
-                  )
-                  .join("")}
-            </table>
+                `).join("");
+                html += `</table>`;
+                html += `<div style="text-align: right; font-weight: bold; font-size: 20px; margin-top: 5px; margin-bottom: 10px;">ยอดรวมสรุปทั้งสิ้นท้ายชื่อ รายการเครื่องดื่ม: ${(drinkTotal).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>`;
+              }
+
+              if (foodOrders.length > 0) {
+                html += `<div style="text-align: center; font-weight: 900; font-size: 22px; margin-top: 5px; border-bottom: 1px solid #000; display: inline-block;">รายการอาหาร</div>`;
+                html += `<table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed; margin-top: 5px;">`;
+                html += foodOrders.map(item => `
+                    <tr>
+                        <td style="width: 50%; padding: 2px 0; word-break: break-word; white-space: normal; vertical-align: top;">${item.productName || item.name || "ไม่มีชื่อสินค้า"}</td>
+                        <td style="width: 25%; text-align: center; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${item.qty}x${item.price}</td>
+                        <td style="width: 25%; text-align: right; padding: 2px 0; vertical-align: top;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${(item.qty * item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</td>
+                    </tr>
+                `).join("");
+                html += `</table>`;
+                html += `<div style="text-align: right; font-weight: bold; font-size: 20px; margin-top: 5px; margin-bottom: 5px;">ยอดรวมสรุปทั้งสิ้นท้ายชื่อ รายการอาหาร: ${(foodTotal).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>`;
+              }
+
+              return html;
+            })()}
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <table style="width: 100%; text-align: left; font-size: 22px; font-weight: 900; color: #000 !important;">
                 <tr>
