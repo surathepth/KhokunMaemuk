@@ -7103,7 +7103,7 @@
             <div style="margin: 3px 0;">NO. ${billNum}</div>
             <div style="margin: 3px 0;">วันที่: ${new Date().toLocaleString("th-TH")}</div>
             <div style="margin: 3px 0;">พนักงาน: ${staffName}</div>
-            <div style="margin: 3px 0; font-size: 18px; font-weight: bold;">โต๊ะ: ${tableName}</div>
+            <div style="margin: 5px 0; font-size: 32px; font-weight: 900; line-height: 1.2;">โต๊ะ: ${tableName}</div>
             <hr style="border-top: 1px dashed black;">
             <div style="font-weight:bold; margin-bottom: 5px;">รายการสินค้า</div>
             <div>
@@ -7131,7 +7131,7 @@
             <div class="print-footer" style="margin-top: 20px; text-align: center;">
                 <div style="margin-bottom: 10px; border-top: 1px dashed #000; padding-top: 10px;">
                     <!-- เปลี่ยนมาดึงภาพจากโฟลเดอร์หลักชื่อ 10001_bank.png และลบ onerror ออกเพื่อป้องกันบราวเซอร์ซ่อนภาพ -->
-                    <img src="10001_bank.png" alt="QR Code Payment" style="width: 200px; max-width: 100%; height: auto; object-fit: contain;"><br>
+                    <img src="QRCODE-ธนาคารร้าน/QRCODEธนาคาร.jpg" alt="QR Code Payment" style="width: 200px; max-width: 100%; height: auto; object-fit: contain;"><br>
                     <!-- โค้ดเดิมที่มีปัญหาเรื่องโฟลเดอร์ภาษาไทย ซ่อนไว้ตามกฎห้ามลบ -->
                     <!-- 
                     <img src="QRCODE-ธนาคาร/1/10001.png" alt="QR Code Payment" style="width: 280px; max-width: 100%; height: auto; object-fit: contain;" onerror="this.style.display='none'"><br>
@@ -11044,7 +11044,7 @@
             <div style="margin: 5px 0; font-weight: 900; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;รายการอาหารเครื่องดื่ม</div>
             <br>
             <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO. ${billNumber}</div>
-            <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
+            <div style="margin: 5px 0; font-size: 32px; font-weight: 900; line-height: 1.2;">&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
             <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
@@ -11068,7 +11068,7 @@
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <div style="margin-top: 10px; font-size: 16px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;กรุณาตรวจสอบรายการก่อนชำระเงิน</div>
             <div style="margin-top: 10px; font-weight: 900; font-size: 22px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;สแกนจ่ายด้วยพร้อมเพย์</div>
-            <img src="${new URL("QRCODE-ธนาคารร้าน/QRCODEธนาคาร.jpg", window.location.href).href}" style="width: 100%; max-width: 240px; margin-top: 10px;">
+            <img src="QRCODE-ธนาคารร้าน/QRCODEธนาคาร.jpg" style="width: 100%; max-width: 240px; margin-top: 10px;">
             <div style="margin-top: 5px; font-weight: 900; font-size: 18px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ชื่อบัญชี: ${ppName}</div>
         </div>
     `;
@@ -11120,7 +11120,7 @@
             <div style="margin: 3px 0; font-size: 20px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO. ${billData.billNumber}</div>
             <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;วันที่: ${new Date().toLocaleString("th-TH")}</div>
             <div style="margin: 3px 0; font-size: 20px; white-space: nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;พนักงาน: ${staffName}</div>
-            <div style="margin: 3px 0; font-size: 22px; font-weight: 900;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
+            <div style="margin: 5px 0; font-size: 32px; font-weight: 900; line-height: 1.2;">&nbsp;&nbsp;&nbsp;โต๊ะ: ${tableName}</div>
             <hr style="border-top: 2px dashed black; margin: 5px 0;">
             <table style="width: 100%; text-align: left; font-size: 20px; font-weight: bold; color: #000 !important; table-layout: fixed;">
                 ${billData.items
