@@ -9772,18 +9772,16 @@
 
       function filterIpaqMenu() {
         const query = document.getElementById("ipaq-menu-search").value.toLowerCase();
-        const items = document.querySelectorAll("#ipaq-menu-grid .ipaq-menu-item");
-        items.forEach((item) => {
-          const nameElement = item.querySelector(".ipaq-menu-item-name");
-          if (nameElement) {
-            const name = nameElement.innerText.toLowerCase();
-            if (name.includes(query)) {
-              item.style.display = "";
-            } else {
-              item.style.display = "none";
-            }
+        const items = document.getElementById("ipaq-menu-grid").children;
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const name = item.getAttribute("data-name");
+          if (name && name.includes(query)) {
+            item.style.display = "";
+          } else {
+            item.style.display = "none";
           }
-        });
+        }
       }
 
       function openIpaqMenuModal() {
@@ -9798,6 +9796,7 @@
         products.forEach((p) => {
           let item = document.createElement("div");
           item.className = "ipaq-menu-item";
+          item.setAttribute("data-name", p.name.toLowerCase());
           item.onclick = () => ipaqAddOrder(p);
 
           let imgSrc =
@@ -9819,18 +9818,24 @@
       }
 
       function ipaqAddOrder(product) {
-        let order = {
-          id: "O" + Date.now(),
-          tableId: currentIpaqTable.id,
-          productId: product.id,
-          name: product.name,
-          productName: product.name,
-          qty: 1,
-          price: product.price,
-          isPaid: false,
-          timestamp: getLocalISOString(new Date()),
-        };
-        tableOrders.push(order);
+        let existingOrder = tableOrders.find((o) => o.tableId === currentIpaqTable.id && o.productId === product.id && !o.isPaid);
+        if (existingOrder) {
+          existingOrder.qty += 1;
+          existingOrder.timestamp = getLocalISOString(new Date());
+        } else {
+          let order = {
+            id: "O" + Date.now(),
+            tableId: currentIpaqTable.id,
+            productId: product.id,
+            name: product.name,
+            productName: product.name,
+            qty: 1,
+            price: product.price,
+            isPaid: false,
+            timestamp: getLocalISOString(new Date()),
+          };
+          tableOrders.push(order);
+        }
 
         closeIpaqMenuModal();
         renderIpaqBill();
@@ -10131,20 +10136,24 @@
         let qtyEl = document.getElementById("ipaq-temp-qty-" + pid);
         let qtyToAdd = qtyEl ? parseInt(qtyEl.value) || 1 : 1;
 
-        // Check if exists in tableOrders
-
-        let order = {
-          id: "O" + Date.now() + Math.floor(Math.random() * 1000),
-          tableId: currentIpaqTable.id,
-          productId: product.id,
-          name: product.name,
-          productName: product.name,
-          qty: qtyToAdd,
-          price: product.price,
-          isPaid: false,
-          timestamp: getLocalISOString(new Date()),
-        };
-        tableOrders.push(order);
+        let existingOrder = tableOrders.find((o) => o.tableId === currentIpaqTable.id && o.productId === product.id && !o.isPaid);
+        if (existingOrder) {
+          existingOrder.qty += qtyToAdd;
+          existingOrder.timestamp = getLocalISOString(new Date());
+        } else {
+          let order = {
+            id: "O" + Date.now() + Math.floor(Math.random() * 1000),
+            tableId: currentIpaqTable.id,
+            productId: product.id,
+            name: product.name,
+            productName: product.name,
+            qty: qtyToAdd,
+            price: product.price,
+            isPaid: false,
+            timestamp: getLocalISOString(new Date()),
+          };
+          tableOrders.push(order);
+        }
 
         // Reset temp qty
         if (qtyEl) qtyEl.value = 1;
@@ -10172,18 +10181,16 @@
 
       function filterIpaqMenu() {
         const query = document.getElementById("ipaq-menu-search").value.toLowerCase();
-        const items = document.querySelectorAll("#ipaq-menu-grid .ipaq-menu-item");
-        items.forEach((item) => {
-          const nameElement = item.querySelector(".ipaq-menu-item-name");
-          if (nameElement) {
-            const name = nameElement.innerText.toLowerCase();
-            if (name.includes(query)) {
-              item.style.display = "";
-            } else {
-              item.style.display = "none";
-            }
+        const items = document.getElementById("ipaq-menu-grid").children;
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const name = item.getAttribute("data-name");
+          if (name && name.includes(query)) {
+            item.style.display = "";
+          } else {
+            item.style.display = "none";
           }
-        });
+        }
       }
 
       function openIpaqMenuModal() {
@@ -10198,6 +10205,7 @@
         products.forEach((p) => {
           let item = document.createElement("div");
           item.className = "ipaq-menu-item";
+          item.setAttribute("data-name", p.name.toLowerCase());
           // We remove the onclick from the whole card to prevent accidental clicks when adjusting qty
 
           let imgHtml = "";
@@ -10247,18 +10255,24 @@
         let qtyEl = document.getElementById("ipaq-temp-qty-" + pid);
         let qtyToAdd = qtyEl ? parseInt(qtyEl.value) || 1 : 1;
 
-        let order = {
-          id: "O" + Date.now() + Math.floor(Math.random() * 1000),
-          tableId: currentIpaqTable.id,
-          productId: product.id,
-          name: product.name,
-          productName: product.name,
-          qty: qtyToAdd,
-          price: product.price,
-          isPaid: false,
-          timestamp: getLocalISOString(new Date()),
-        };
-        tableOrders.push(order);
+        let existingOrder = tableOrders.find((o) => o.tableId === currentIpaqTable.id && o.productId === product.id && !o.isPaid);
+        if (existingOrder) {
+          existingOrder.qty += qtyToAdd;
+          existingOrder.timestamp = getLocalISOString(new Date());
+        } else {
+          let order = {
+            id: "O" + Date.now() + Math.floor(Math.random() * 1000),
+            tableId: currentIpaqTable.id,
+            productId: product.id,
+            name: product.name,
+            productName: product.name,
+            qty: qtyToAdd,
+            price: product.price,
+            isPaid: false,
+            timestamp: getLocalISOString(new Date()),
+          };
+          tableOrders.push(order);
+        }
 
         if (qtyEl) qtyEl.value = 1;
 
