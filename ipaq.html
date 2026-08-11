@@ -127,7 +127,7 @@
         .new-item { border-left: 4px solid #48bb78; }
         
         /* Responsive */
-        @media screen and (max-width: 600px) {
+        @media screen and (max-width: 850px) {
             .order-container { flex-direction: column; overflow-y: auto; }
             .menu-area { border-right: none; }
             .cart-area { flex: none; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
@@ -145,6 +145,23 @@
             <input type="text" id="login-id" placeholder="รหัสพนักงาน">
             <input type="password" id="login-pass" placeholder="รหัสผ่าน">
             <button class="btn btn-blue" style="width: 100%; margin-top: 10px;" onclick="doLogin()">เข้าสู่ระบบ</button>
+        </div>
+    </div>
+
+    <!-- Modal หมายเหตุ -->
+    <div id="note-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.85); z-index:9999; backdrop-filter:blur(10px); justify-content:center; align-items:center;">
+        <div style="background:#fff; width:90%; max-width:400px; padding:25px; border-radius:24px; box-shadow:0 15px 35px rgba(0,0,0,0.1); border:1px solid rgba(255,255,255,0.5);">
+            <h3 style="margin-top:0; color:#2d3748; font-weight:700;">📝 เพิ่มหมายเหตุ</h3>
+            <input type="hidden" id="note-item-index">
+            <select id="note-printer" style="width:100%; padding:14px; margin-bottom:15px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; font-size:16px;">
+                <option value="[Kit1]">เครื่องครัว (Kit1)</option>
+                <option value="[Cash]">แคชเชียร์ (Cash)</option>
+            </select>
+            <input type="text" id="note-text" placeholder="ระบุหมายเหตุ (เช่น ไม่เผ็ด, ห่อกลับ)" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:1px solid #e2e8f0; background:#f8fafc; font-size:16px;">
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeNoteModal()" style="flex:1; padding:14px; border-radius:12px; background:#edf2f7; color:#4a5568; border:none; font-size:16px; font-weight:600;">ยกเลิก</button>
+                <button onclick="saveNoteModal()" style="flex:1; padding:14px; border-radius:12px; background:linear-gradient(135deg, #38b2ac 0%, #319795 100%); color:#fff; border:none; font-size:16px; font-weight:600;">บันทึก</button>
+            </div>
         </div>
     </div>
 
@@ -598,7 +615,6 @@
                     html += '<div class="cart-item-name">' + newItem.name + '<br><small style="color:gray;font-weight:normal;cursor:pointer;" onclick="addNote(' + j + ')">📝 ' + (newItem.note || 'เพิ่มหมายเหตุ') + '</small></div>';
                     html += '<div class="cart-item-qty">x' + newItem.qty + '</div>';
                     html += '<div class="cart-item-price">฿' + (Number(newItem.price) * Number(newItem.qty)).toFixed(2) + '</div>';
-                    html += '<div style="margin-left: 10px; color:red; cursor:pointer; font-size:18px;" onclick="removeNewCartItem(' + j + ')">❌</div>';
                     html += '</div>';
                 }
             }
@@ -617,11 +633,37 @@
 
         function addNote(index) {
             var currentNote = newCartItems[index].note || "";
-            var note = prompt("ใส่หมายเหตุ:", currentNote);
-            if (note !== null) {
-                newCartItems[index].note = note;
-                renderCart();
+            document.getElementById("note-item-index").value = index;
+            
+            if (currentNote.indexOf("[Kit1]") === 0) {
+                document.getElementById("note-printer").value = "[Kit1]";
+                document.getElementById("note-text").value = currentNote.replace("[Kit1]", "").trim();
+            } else if (currentNote.indexOf("[Cash]") === 0) {
+                document.getElementById("note-printer").value = "[Cash]";
+                document.getElementById("note-text").value = currentNote.replace("[Cash]", "").trim();
+            } else {
+                document.getElementById("note-printer").value = "[Kit1]";
+                document.getElementById("note-text").value = currentNote;
             }
+            document.getElementById("note-modal").style.display = "flex";
+        }
+
+        function closeNoteModal() {
+            document.getElementById("note-modal").style.display = "none";
+        }
+
+        function saveNoteModal() {
+            var index = document.getElementById("note-item-index").value;
+            var printer = document.getElementById("note-printer").value;
+            var text = document.getElementById("note-text").value.trim();
+            
+            if (text !== "") {
+                newCartItems[index].note = printer + " " + text;
+            } else {
+                newCartItems[index].note = "";
+            }
+            closeNoteModal();
+            renderCart();
         }
 
         // ================= SEND ORDER =================
