@@ -10,6 +10,35 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
+        /* --- Receipt Printing --- */
+        @media screen {
+            #receipt-print-area {
+                position: absolute;
+                left: -9999px;
+                top: 0;
+            }
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #receipt-print-area,
+            #receipt-print-area * {
+                visibility: visible;
+            }
+            #receipt-print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                /* สำหรับเครื่องพิมพ์ 80mm */
+                max-width: 80mm;
+                margin: 0;
+                padding: 0;
+                font-family: "Sarabun", "Courier New", Courier, monospace;
+            }
+        }
+
         body { font-family: 'Prompt', sans-serif; background: #f0f4f8; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; color: #2d3748; }
         
         /* Glassmorphism Header */
@@ -754,23 +783,23 @@
             printArea.innerHTML = itemsCashHtml;
             printArea.style.display = "block";
             window.print();
+            printArea.style.display = "none";
 
-            // พิมพ์จังหวะที่ 2 (Kit1)
-            setTimeout(function() {
-                if (!itemsHtml) {
-                    printArea.innerHTML = "";
+            // พิมพ์จังหวะที่ 2 (Kit1) โดยใช้ User Gesture ป้องกันเบราว์เซอร์มือถือบล็อกป๊อปอัป
+            if (itemsHtml) {
+                Swal.fire({
+                    title: "สั่งพิมพ์บิลรวมแล้ว",
+                    text: "กรุณากดตกลงเพื่อพิมพ์บิลเข้าครัว (Kit1)",
+                    icon: "info",
+                    confirmButtonText: "ตกลง พิมพ์บิลครัว",
+                    allowOutsideClick: false
+                }).then(function() {
+                    printArea.innerHTML = itemsHtml;
+                    printArea.style.display = "block";
+                    window.print();
                     printArea.style.display = "none";
-                    return;
-                }
-                printArea.innerHTML = itemsHtml;
-                printArea.style.display = "block";
-                window.print();
-                
-                setTimeout(function() {
-                    printArea.innerHTML = "";
-                    printArea.style.display = "none";
-                }, 500);
-            }, 500);
+                });
+            }
         }
 
         // ================= SEND ORDER =================
@@ -823,17 +852,18 @@
                 return database.ref("erp_db_orders/" + currentTableId).set(orderData);
             }).then(function() {
                 var tableNameText = document.getElementById("order-table-name").innerText.replace("โต๊ะ ", "");
-                
+                var itemsToPrint = newCartItems.slice(); // คัดลอกรายการอาหารไปพิมพ์
+
+                // [Lilin Fix] ล้างตะกร้าเป็นอันดับแรกสุด ป้องกันการกดเบิ้ล 100%
+                newCartItems = [];
+                renderCart();
+                btn.innerHTML = "🚀 ส่งออเดอร์เข้าครัว";
+                btn.disabled = false;
+
                 Swal.fire("สำเร็จ!", "ส่งออเดอร์เข้าครัวเรียบร้อย", "success").then(function() {
                     // [Lilin Fix] เรียกพิมพ์ 2 จังหวะที่ IPAQ ทันที
-                    printIpaqOrderLocally(newCartItems, tableNameText);
+                    printIpaqOrderLocally(itemsToPrint, tableNameText);
                     
-                    // [Lilin Fix] ล้างตะกร้าป้องกันกดซ้ำ
-                    newCartItems = [];
-                    renderCart();
-                    
-                    btn.innerHTML = "🚀 ส่งออเดอร์เข้าครัว";
-                    btn.disabled = false;
                     goBackToTables();
                 });
             }).catch(function(err) {
