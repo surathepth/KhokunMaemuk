@@ -54,14 +54,15 @@
         /* Menu Grid - Fixed Hollow Space */
         .product-grid { display: flex; flex-wrap: wrap; justify-content: flex-start; margin: 0 -7px; }
         .menu-item {
-            width: calc(33.333% - 14px);
+            box-sizing: border-box;
+            width: calc(33.333% - 15px);
             margin: 7px;
             border-radius: 18px;
             overflow: hidden;
             text-align: center;
             cursor: pointer;
             background: #fff;
-            height: 180px;
+            height: 140px;
             box-shadow: 0 6px 16px rgba(0,0,0,0.05);
             border: 1px solid rgba(255,255,255,0.5);
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
@@ -88,10 +89,10 @@
             box-sizing: border-box;
         }
         .menu-name { 
-            font-size: 14px; 
+            font-size: 16px; 
             font-weight: 600; 
             color: #2d3748; 
-            margin-bottom: 4px; 
+            margin-bottom: 2px; 
             line-height: 1.25;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -100,7 +101,7 @@
             text-shadow: none;
         }
         .menu-price { 
-            font-size: 16px; 
+            font-size: 18px; 
             color: #38b2ac; 
             font-weight: 700; 
             text-shadow: none;
@@ -126,12 +127,17 @@
         .old-item { border-left: 4px solid #cbd5e0; }
         .new-item { border-left: 4px solid #48bb78; }
         
-        /* Responsive */
-        @media screen and (max-width: 850px) {
+        /* Responsive Mobile (iPhone) */
+        @media screen and (max-width: 600px) {
             .order-container { flex-direction: column; overflow-y: auto; }
             .menu-area { border-right: none; }
             .cart-area { flex: none; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
             .menu-item { width: calc(50% - 14px); }
+        }
+        
+        /* Responsive Tablet Portrait (iPad) */
+        @media screen and (min-width: 601px) and (max-width: 850px) {
+            .menu-item { width: calc(50% - 14px); } /* บังคับ 2 คอลัมน์บน iPad แนวตั้งเพื่อลบช่องว่าง */
         }
     </style>
 </head>
