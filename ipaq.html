@@ -484,7 +484,7 @@
                 html += '<div class="menu-item-overlay"></div>';
                 html += '<div class="menu-item-content">';
                 html += '<div class="menu-name">' + p.name + '</div>';
-                html += '<div class="menu-price">฿' + Number(p.price).toLocaleString() + '</div>';
+                html += '<div class="menu-price">฿' + Number(p.price).toFixed(2) + '</div>';
                 html += '</div></div>';
             }
             document.getElementById("product-grid").innerHTML = html;
@@ -577,7 +577,7 @@
                         html += '<div class="cart-item old-item">';
                         html += '<div class="cart-item-name">' + oldItem.name + '</div>';
                         html += '<div class="cart-item-qty">x' + oldItem.qty + '</div>';
-                        html += '<div class="cart-item-price">฿' + (oldItem.price * oldItem.qty).toLocaleString() + '</div>';
+                        html += '<div class="cart-item-price">฿' + (oldItem.price * oldItem.qty).toFixed(2) + '</div>';
                         html += '</div>';
                     }
                 }
@@ -597,7 +597,7 @@
                     html += '<div class="cart-item new-item">';
                     html += '<div class="cart-item-name">' + newItem.name + '<br><small style="color:gray;font-weight:normal;cursor:pointer;" onclick="addNote(' + j + ')">📝 ' + (newItem.note || 'เพิ่มหมายเหตุ') + '</small></div>';
                     html += '<div class="cart-item-qty">x' + newItem.qty + '</div>';
-                    html += '<div class="cart-item-price">฿' + (Number(newItem.price) * Number(newItem.qty)).toLocaleString() + '</div>';
+                    html += '<div class="cart-item-price">฿' + (Number(newItem.price) * Number(newItem.qty)).toFixed(2) + '</div>';
                     html += '<div style="margin-left: 10px; color:red; cursor:pointer; font-size:18px;" onclick="removeNewCartItem(' + j + ')">❌</div>';
                     html += '</div>';
                 }
