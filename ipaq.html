@@ -671,6 +671,107 @@
             closeNoteModal();
             renderCart();
         }
+        // ================= LILIN PRINT LOGIC =================
+        function printIpaqOrderLocally(items, tableName) {
+            var printArea = document.getElementById("receipt-print-area");
+            if (!printArea) {
+                printArea = document.createElement("div");
+                printArea.id = "receipt-print-area";
+                printArea.style.display = "none";
+                document.body.appendChild(printArea);
+            }
+
+            var tOrders = items;
+            var kitchenOrders = [];
+            var itemsCashHtml = "";
+            var itemsHtml = "";
+
+            // กรองเครื่องดื่มสำหรับบิลครัว
+            for (var i = 0; i < tOrders.length; i++) {
+                var item = tOrders[i];
+                var name = item.name || "ไม่มีชื่อสินค้า";
+                var isDrink = name.indexOf("น้ำเปล่า") > -1 || name.indexOf("น้ำแข็ง") > -1 || name.indexOf("โซดา") > -1 || name.indexOf("เบียร์") > -1 || name.indexOf("กาแฟ") > -1 ||
+                              name.toLowerCase().indexOf("coke") > -1 || name.indexOf("LEO") > -1 || name.indexOf("ลีโอ") > -1 || name.toLowerCase().indexOf("soda") > -1 || name.indexOf("โคล่า") > -1 || 
+                              name.indexOf("โค้ก") > -1 || name.indexOf("เป๊ปซี่") > -1 || name.toLowerCase().indexOf("pepsi") > -1 || name.indexOf("สไปรท์") > -1 || name.toLowerCase().indexOf("sprite") > -1 || 
+                              name.toLowerCase().indexOf("heineken") > -1 || name.indexOf("ไฮเนเก้น") > -1 || name.toLowerCase().indexOf("beer") > -1 || name.indexOf("ไวน์") > -1 || 
+                              name.indexOf("แสงโสม") > -1 || name.indexOf("หงส์ทอง") > -1 || name.indexOf("รีเจนซี่") > -1 || name.indexOf("285") > -1 || 
+                              name.indexOf("ช้าง") > -1 || name.indexOf("สิงห์") > -1 || name.indexOf("ม้า") > -1 || name.indexOf("ชา") > -1 || name.indexOf("นม") > -1;
+                
+                item.isDrinkItem = isDrink;
+                if (!isDrink) {
+                    kitchenOrders.push(item);
+                }
+            }
+
+            var printDate = new Date();
+            var formattedTime = printDate.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" });
+            var formattedDate = printDate.toLocaleDateString("th-TH", { day: "2-digit", month: "2-digit", year: "2-digit" });
+            var dateTimeStr = formattedDate + "-" + formattedTime;
+
+            // 1. สร้างบิลแคชเชียร์ (รวม)
+            itemsCashHtml += '<div style="font-family: \'Kanit\', \'Sarabun\', sans-serif; width: 100%; padding: 0; margin: 0; box-sizing: border-box; color: #000; line-height: 1.2;">';
+            itemsCashHtml += '<div style="text-align: center; font-size: 28px; font-weight: 900; margin-bottom: 5px; margin-top: 0;">โต๊ะ: ' + tableName + '</div>';
+            itemsCashHtml += '<div style="text-align: center; font-size: 16px; margin-bottom: 15px;">วันที่: ' + dateTimeStr + '</div>';
+            itemsCashHtml += '<div style="border-bottom: 1px dashed #000; margin-bottom: 10px;"></div>';
+            
+            for (var j = 0; j < tOrders.length; j++) {
+                var o = tOrders[j];
+                var nameStr = o.name || "ไม่มีชื่อสินค้า";
+                var printQty = Number(o.qty) || 1;
+                var price = parseFloat(o.price) || 0;
+                var total = price * printQty;
+                itemsCashHtml += '<div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 5px; align-items: flex-start;">';
+                itemsCashHtml += '<div style="width: 50%; word-break: break-word; text-align: left;">' + nameStr + '</div>';
+                itemsCashHtml += '<div style="width: 25%; text-align: center;">' + printQty + 'x' + price + '</div>';
+                itemsCashHtml += '<div style="width: 25%; text-align: right;">' + total.toFixed(2) + '</div>';
+                itemsCashHtml += '</div>';
+            }
+            itemsCashHtml += '<div style="border-bottom: 1px dashed #000; margin-top: 10px; margin-bottom: 15px;"></div></div>';
+
+            // 2. สร้างบิลครัว (แยก)
+            for (var k = 0; k < kitchenOrders.length; k++) {
+                var ko = kitchenOrders[k];
+                var nameStrKo = ko.name || "ไม่มีชื่อสินค้า";
+                var printQtyKo = Number(ko.qty) || 1;
+                var totalKo = (parseFloat(ko.price) || 0) * printQtyKo;
+                var cleanNote = ko.note ? ko.note.replace(/\*\s*รสชาติ/g, '').replace(/หมายเหตุ:?/g, '').trim() : "";
+                var noteHtml = cleanNote ? '<div style="font-size: 24px; font-weight: 900; text-align: left; margin-bottom: 10px; color: #000; padding-left: 10px;">' + cleanNote + '</div>' : "";
+                
+                itemsHtml += '<div style="font-family: \'Kanit\', \'Sarabun\', sans-serif; width: 100%; padding: 0; margin: 0; box-sizing: border-box; color: #000; line-height: 1.2; ' + (k < kitchenOrders.length - 1 ? "page-break-after: always;" : "") + '">';
+                itemsHtml += '<div style="text-align: right; font-size: 28px; font-weight: 900; margin-bottom: 5px; margin-top: 0;">โต๊ะ ' + tableName + '</div>';
+                itemsHtml += '<div style="font-weight: 900; font-size: 24px; word-break: break-word; text-align: left; margin-bottom: 10px;">' + nameStrKo + '</div>';
+                itemsHtml += noteHtml;
+                itemsHtml += '<div style="display: flex; justify-content: space-between; font-size: 24px; font-weight: 900; margin-bottom: 10px;">';
+                itemsHtml += '<div style="width: 25%; text-align: left;">' + printQtyKo + '</div>';
+                itemsHtml += '<div style="width: 35%; text-align: center;">' + (parseFloat(ko.price) || 0).toFixed(2) + '</div>';
+                itemsHtml += '<div style="width: 40%; text-align: right;">' + totalKo.toFixed(2) + '</div>';
+                itemsHtml += '</div>';
+                itemsHtml += '<div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 15px;">' + dateTimeStr + '</div>';
+                itemsHtml += '<div style="border-bottom: 2px dashed #000; margin-top: 5px; margin-bottom: 15px;"></div></div>';
+            }
+
+            // พิมพ์จังหวะที่ 1 (Cash)
+            printArea.innerHTML = itemsCashHtml;
+            printArea.style.display = "block";
+            window.print();
+
+            // พิมพ์จังหวะที่ 2 (Kit1)
+            setTimeout(function() {
+                if (!itemsHtml) {
+                    printArea.innerHTML = "";
+                    printArea.style.display = "none";
+                    return;
+                }
+                printArea.innerHTML = itemsHtml;
+                printArea.style.display = "block";
+                window.print();
+                
+                setTimeout(function() {
+                    printArea.innerHTML = "";
+                    printArea.style.display = "none";
+                }, 500);
+            }, 500);
+        }
 
         // ================= SEND ORDER =================
         function sendOrder() {
@@ -707,7 +808,7 @@
                 if (snapshot.exists()) {
                     var existing = snapshot.val();
                     if (existing.items) {
-                        var existingItems = Array.isArray(existing.items) ? existing.items : Object.values(existing.items);
+                        var existingItems = Array.isArray(existing.items) ? existing.items : Object.keys(existing.items).map(function(k) { return existing.items[k]; });
                         // เอาของเดิมในฐานข้อมูลมาเป็นฐาน
                         var mergedItems = existingItems.slice();
                         // เติมของใหม่เข้าไป
@@ -721,7 +822,16 @@
 
                 return database.ref("erp_db_orders/" + currentTableId).set(orderData);
             }).then(function() {
+                var tableNameText = document.getElementById("order-table-name").innerText.replace("โต๊ะ ", "");
+                
                 Swal.fire("สำเร็จ!", "ส่งออเดอร์เข้าครัวเรียบร้อย", "success").then(function() {
+                    // [Lilin Fix] เรียกพิมพ์ 2 จังหวะที่ IPAQ ทันที
+                    printIpaqOrderLocally(newCartItems, tableNameText);
+                    
+                    // [Lilin Fix] ล้างตะกร้าป้องกันกดซ้ำ
+                    newCartItems = [];
+                    renderCart();
+                    
                     btn.innerHTML = "🚀 ส่งออเดอร์เข้าครัว";
                     btn.disabled = false;
                     goBackToTables();
