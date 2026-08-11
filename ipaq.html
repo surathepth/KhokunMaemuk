@@ -217,7 +217,7 @@
 
         // ================= LOGIC TABLES =================
         function loadTables() {
-            database.ref("erp_db_tables").once("value").then(function(snapshot) {
+            database.ref("erp_db_table").once("value").then(function(snapshot) {
                 allTables = [];
                 if (snapshot.exists()) {
                     var data = snapshot.val();
@@ -343,7 +343,7 @@
 
         // ================= LOGIC PRODUCTS =================
         function loadProducts() {
-            database.ref("erp_db_products").once("value").then(function(snapshot) {
+            database.ref("erp_db_product").once("value").then(function(snapshot) {
                 allProducts = [];
                 var catMap = {};
                 if (snapshot.exists()) {
