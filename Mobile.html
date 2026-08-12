@@ -282,7 +282,7 @@
             <!-- ฝั่งขวา: ตะกร้า (ตอนนี้เป็น Bottom Sheet) -->
             <div class="cart-area" id="cart-area-modal">
                 <button class="close-cart-btn" onclick="toggleCartModal()">✖</button>
-                <div style="background: #fff; color: #2d3748; padding: 20px; text-align: center; font-weight: bold; font-size: 20px; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 25px; border-top-right-radius: 25px;">
+                <div id="cart-modal-title" style="background: #fff; color: #2d3748; padding: 20px; text-align: center; font-weight: bold; font-size: 20px; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 25px; border-top-right-radius: 25px;">
                     รายการสั่งของโต๊ะนี้
                 </div>
                 <div class="cart-items" id="cart-items">
@@ -501,6 +501,12 @@
             currentTableId = tId;
             currentTableName = tName;
             document.getElementById("order-table-name").innerText = tName;
+            
+            var cartTitleEl = document.getElementById("cart-modal-title");
+            if (cartTitleEl) {
+                cartTitleEl.innerText = "รายการสั่งของ " + tName;
+            }
+
             document.getElementById("table-screen").style.display = "none";
             document.getElementById("order-screen").style.display = "flex";
             newCartItems = [];
