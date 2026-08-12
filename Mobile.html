@@ -907,7 +907,8 @@
                 '<span>ยอดรวม</span>' +
                 '<span>' + grandTotal.toFixed(2) + '</span>' +
                 '</div>' +
-                '<div style="text-align:center; font-size:10px; margin-top:10px; margin-bottom:20px;">ขอบคุณที่ใช้บริการค่ะ</div>';
+                '<div style="text-align:center; font-size:10px; margin-top:10px; margin-bottom:20px;">ขอบคุณที่ใช้บริการค่ะ</div>' +
+                '<div style="height:40px;"></div>';
 
             setTimeout(function() {
                 window.print();
@@ -983,6 +984,7 @@
                 itemsHtml += '<div style="border-bottom: 2px dashed #000; margin-top: 5px; margin-bottom: 15px;"></div>';
                 itemsHtml += '</div>';
             }
+            itemsHtml += '<div style="height:40px;"></div>';
 
             printArea.innerHTML = itemsHtml;
 
