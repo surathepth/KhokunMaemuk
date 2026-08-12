@@ -743,11 +743,20 @@
             var stickyCount = document.getElementById("sticky-cart-count");
             var stickyTotal = document.getElementById("sticky-cart-total");
             var stickyBar = document.getElementById("sticky-cart-bar");
-            if (stickyCount) stickyCount.innerText = newTotalQty;
-            if (stickyTotal) stickyTotal.innerText = "฿" + newTotalPrice.toLocaleString() + " >";
+            // Calculate old items quantity for sticky count
+            var oldTotalQty = 0;
+            if (currentOrderItems && currentOrderItems.length > 0) {
+                for (var i = 0; i < currentOrderItems.length; i++) {
+                    oldTotalQty += Number(currentOrderItems[i].qty);
+                }
+            }
+            var allTotalQty = newTotalQty + oldTotalQty;
+
+            if (stickyCount) stickyCount.innerText = allTotalQty;
+            if (stickyTotal) stickyTotal.innerText = "฿" + grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " >";
             
             if (stickyBar) {
-                if (newTotalQty > 0) {
+                if (allTotalQty > 0) {
                     stickyBar.style.display = "flex";
                 } else {
                     stickyBar.style.display = "none";
