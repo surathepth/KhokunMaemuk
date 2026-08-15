@@ -5171,9 +5171,9 @@
       });
 
       function getProductDB() {
-        return window.erpData && window.erpData["product"]
-          ? window.erpData["product"]
-          : {};
+        let db1 = window.erpData && window.erpData["product"] ? window.erpData["product"] : {};
+        let db2 = window.productDB || {};
+        return Object.assign({}, db1, db2);
       }
 
       // [Lilin Additive] ระบบค้นหาสินค้าอัจฉริยะ (Instant Search Autocomplete) โชว์รายละเอียดเต็ม ค้นหาได้ทันที
@@ -10077,10 +10077,9 @@
 
         products = [];
         try {
-          let dbProducts =
-            window.erpData && window.erpData["product"]
-              ? window.erpData["product"]
-              : window.productDB || {};
+          let globalDb = window.erpData && window.erpData["product"] ? window.erpData["product"] : {};
+          let shopDb = window.productDB || {};
+          let dbProducts = Object.assign({}, globalDb, shopDb);
           for (let pId in dbProducts) {
             let p = dbProducts[pId];
             if (p) {
@@ -11313,7 +11312,7 @@ function _fallbackPromptEdit(orderItem) {
             tOrders.forEach((o) => {
                 let rowTotal = (parseFloat(o.qty) || 0) * (parseFloat(o.price) || 0);
                 let isDiscountable = true;
-                let currentProductDB = (window.erpData && window.erpData.product) ? window.erpData.product : (window.productDB || {});
+                let currentProductDB = Object.assign({}, (window.erpData && window.erpData.product) || {}, window.productDB || {});
                 let p = currentProductDB[o.productId] || currentProductDB[o.barcode] || Object.values(currentProductDB).find(x => x.name === o.productName || x.name === o.name);
                 if (p && p.allowDiscount === false) {
                     isDiscountable = false;
@@ -11380,7 +11379,7 @@ function _fallbackPromptEdit(orderItem) {
             tOrders.forEach((o) => {
                 let rowTotal = (parseFloat(o.qty) || 0) * (parseFloat(o.price) || 0);
                 let isDiscountable = true;
-                let currentProductDB = (window.erpData && window.erpData.product) ? window.erpData.product : (window.productDB || {});
+                let currentProductDB = Object.assign({}, (window.erpData && window.erpData.product) || {}, window.productDB || {});
                 let p = currentProductDB[o.productId] || currentProductDB[o.barcode] || Object.values(currentProductDB).find(x => x.name === o.productName || x.name === o.name);
                 if (p && p.allowDiscount === false) {
                     isDiscountable = false;
@@ -12659,7 +12658,7 @@ function _fallbackPromptEdit(orderItem) {
             tOrders.forEach((o) => {
                 let rowTotal = (parseFloat(o.qty) || 0) * (parseFloat(o.price) || 0);
                 let isDiscountable = true;
-                let currentProductDB = (window.erpData && window.erpData.product) ? window.erpData.product : (window.productDB || {});
+                let currentProductDB = Object.assign({}, (window.erpData && window.erpData.product) || {}, window.productDB || {});
                 let p = currentProductDB[o.productId] || currentProductDB[o.barcode] || Object.values(currentProductDB).find(x => x.name === o.productName || x.name === o.name);
                 if (p && p.allowDiscount === false) {
                     isDiscountable = false;
@@ -13016,7 +13015,7 @@ function _fallbackPromptEdit(orderItem) {
             tOrders.forEach((o) => {
                 let rowTotal = (parseFloat(o.qty) || 0) * (parseFloat(o.price) || 0);
                 let isDiscountable = true;
-                let currentProductDB = (window.erpData && window.erpData.product) ? window.erpData.product : (window.productDB || {});
+                let currentProductDB = Object.assign({}, (window.erpData && window.erpData.product) || {}, window.productDB || {});
                 let p = currentProductDB[o.productId] || currentProductDB[o.barcode] || Object.values(currentProductDB).find(x => x.name === o.productName || x.name === o.name);
                 if (p && p.allowDiscount === false) {
                     isDiscountable = false;
