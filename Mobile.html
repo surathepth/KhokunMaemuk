@@ -268,6 +268,15 @@
             <!-- ฝั่งซ้าย: เมนู -->
             <div class="menu-area">
                 <input type="text" id="menu-search" placeholder="🔍 ค้นหาเมนู..." style="width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;" onkeyup="filterMenu()">
+                
+                <!-- === ระบบหมายเหตุด่วน (Quick Notes) สำหรับแคชเชียร์/พนักงาน === -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px;">
+                    <button class="btn btn-red" style="flex: 1; padding: 10px; font-size: 14px; white-space: nowrap;" onclick="sendQuickNote('🔥 ตามอาหาร (ออกครัวด่วน)')">🔥 ออกครัว</button>
+                    <button class="btn btn-blue" style="flex: 1; padding: 10px; font-size: 14px; white-space: nowrap;" onclick="sendQuickNote('🎵 ขอเพลง')">🎵 ขอเพลง</button>
+                    <button class="btn btn-green" style="flex: 1; padding: 10px; font-size: 14px; white-space: nowrap;" onclick="sendQuickNote('🙋 เรียกพนักงาน')">🙋 เรียกพนักงาน</button>
+                </div>
+                <!-- ======================================================= -->
+                
                 <select id="category-select" style="width:100%; padding:12px; font-size:16px; border-radius:12px; border:1px solid #ccc; background:#fff; margin-bottom:15px; font-family:'Prompt',sans-serif;" onchange="selectCategory(this.value)">
                     <option value="ทั้งหมด">ทั้งหมด</option>
                 </select>
@@ -378,9 +387,23 @@
             document.getElementById("table-screen").style.display = "block";
             loadTables();
             loadProducts();
+
+            // === ระบบ Shift Lock (ล็อกกะพนักงาน ไม่ให้ปิดเว็บทิ้ง) ===
+            window.addEventListener('beforeunload', handleShiftLock);
+        }
+
+        function handleShiftLock(e) {
+            if (currentUser) {
+                var confirmationMessage = "คุณยังอยู่ในกะการทำงาน (Shift Lock) กรุณากดปุ่ม 'ออก' (Logout) ให้เรียบร้อยก่อนปิดหน้านี้";
+                e.returnValue = confirmationMessage; 
+                return confirmationMessage; 
+            }
         }
 
         function doLogout() {
+            // ปลดล็อก Shift Lock เมื่อกดปุ่มออก
+            window.removeEventListener('beforeunload', handleShiftLock);
+
             currentUser = null;
             document.getElementById("table-screen").style.display = "none";
             document.getElementById("order-screen").style.display = "none";
@@ -527,6 +550,36 @@
                 renderCart();
             });
         }
+
+        // === ฟังก์ชันส่งหมายเหตุด่วน (Quick Notes) ===
+        function sendQuickNote(noteText) {
+            if (!currentTableId) {
+                alert("กรุณาเลือกโต๊ะก่อนส่งหมายเหตุ");
+                return;
+            }
+            
+            var noteId = "note_" + new Date().getTime();
+            var noteData = {
+                note: noteText,
+                tableId: currentTableId,
+                tableName: currentTableName,
+                time: new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            database.ref("erp_db_quick_notes/" + noteId).set(noteData).then(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ส่งหมายเหตุสำเร็จ',
+                    text: noteText,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }).catch(function(err) {
+                alert("ส่งหมายเหตุล้มเหลว: " + err.message);
+            });
+        }
+        // ===========================================
 
         function goBackToTables() {
             if (newCartItems.length > 0) {
@@ -699,6 +752,7 @@
                         html += '<div class="cart-item-name">' + oldItem.name + '</div>';
                         html += '<div class="cart-item-qty">x' + oldItem.qty + '</div>';
                         html += '<div class="cart-item-price">฿' + (oldItem.price * oldItem.qty).toLocaleString() + '</div>';
+                        // Order Modification Lock: สินค้าเดิมที่ส่งเข้าครัวแล้ว จะไม่มีปุ่มให้กดลบเด็ดขาด!
                         html += '</div>';
                     }
                 }
@@ -870,6 +924,32 @@
         }
 
         // ================= PRINT CASH BILL (บิลรวม อาหาร+เครื่องดื่ม) =================
+        // === AUDIT LOG SYSTEM (เชื่อมฐานข้อมูลส่วนกลาง) ===
+        function saveIpaqAuditLog(actionType, detail, tableId, tableName, staffName, oldValue, newValue) {
+            var logRef = database.ref("erp_db_audit_log").push();
+            var now = new Date();
+            var dateStr = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+            var timeStr = now.toLocaleTimeString('th-TH', { hour12: false });
+            
+            var logData = {
+                date: dateStr,
+                time: timeStr,
+                staff: staffName || "Unknown (Mobile)",
+                action: actionType,
+                detail: detail || "",
+                table_id: tableId || "",
+                table_name: tableName || "",
+                old_value: oldValue !== undefined ? oldValue : null,
+                new_value: newValue !== undefined ? newValue : null,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            logRef.set(logData).catch(function(err) {
+                console.error("Save Audit Log Failed:", err);
+            });
+        }
+        // =================================================
+
         function printCashBill(items, tableName, callback) {
             var printArea = document.getElementById("receipt-print-area");
             if (!printArea) { if (callback) callback(); return; }

@@ -1536,6 +1536,45 @@
                 >
                   📥 นำเข้าข้อมูล
                 </button>
+                  <style>
+                    .ipaq-menu-header {
+                      background: #2c3e50;
+                      padding: 10px 15px;
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      font-size: 18px;
+                      font-weight: bold;
+                      border-bottom: 2px solid #e74c3c;
+                    }
+                    
+                    /* Category Tabs for IPAQ */
+                    .ipaq-category-scroll { 
+                      display: flex; 
+                      overflow-x: auto; 
+                      white-space: nowrap; 
+                      padding: 8px 10px; 
+                      background: #fff; 
+                      border-bottom: 1px solid #ddd;
+                    }
+                    .ipaq-category-scroll::-webkit-scrollbar { display: none; }
+                    .ipaq-category-btn { 
+                      padding: 6px 15px; 
+                      border-radius: 20px; 
+                      background: #eee; 
+                      margin-right: 8px; 
+                      font-size: 14px; 
+                      color: #555; 
+                      border: none; 
+                      cursor: pointer; 
+                      font-family: 'Prompt', sans-serif;
+                    }
+                    .ipaq-category-btn.active { 
+                      background: #2ecc71; 
+                      color: white; 
+                      font-weight: 600; 
+                    }
+                  </style>
                 <input
                   type="file"
                   id="import-file"
@@ -2920,6 +2959,14 @@
         >
           📊 6. รายงานยอดขายตามเลขที่บิล
         </button>
+        <!-- [Lilin Additive 2026-08-17] ปุ่มรายงานสรุปการเงิน (Executive Master Report) -->
+        <button
+          class="btn btn-save"
+          style="background-color: #d4af37; color: #fff; margin-top: 10px; font-weight: bold; font-size: 1.1em; border: 2px solid #b58900;"
+          onclick="generateReport('master_financial')"
+        >
+          💎 7. รายงานสรุปการเงิน (Executive Master Report)
+        </button>
       </div>
 
       <div id="report-result-wrapper" style="display: none; margin-top: 20px">
@@ -3061,6 +3108,7 @@
                 fbSales[key].details,
                 fbSales[key].itemsJSON || "[]",
                 fbSales[key].transferInput || 0,
+                fbSales[key].debtAmount || 0,
               ]);
             }
           }
@@ -3253,17 +3301,20 @@
             let totalCashInput = 0;
             let totalChangeDue = 0;
             let totalTransfer = 0;
+            let totalDebt = 0;
 
             filteredSales.forEach((row) => {
               let gt = parseFloat(String(row[1]).replace(/,/g, "")) || 0; // ยอดขาย
               let ci = parseFloat(String(row[2]).replace(/,/g, "")) || 0; // รับเงินสด
               let cd = parseFloat(String(row[3]).replace(/,/g, "")) || 0; // เงินทอน
               let tr = parseFloat(String(row[6]).replace(/,/g, "")) || 0; // ยอดโอน (ดึงจาก index 6)
+              let db = parseFloat(String(row[7]).replace(/,/g, "")) || 0; // ยอดลูกหนี้ (ดึงจาก index 7)
 
               totalSales += gt;
               totalCashInput += ci;
               totalChangeDue += cd;
               totalTransfer += tr;
+              totalDebt += db;
             });
 
             // 🛠️ [ADDITIVE] ตรวจสอบและแปลงปี พ.ศ. เป็น ค.ศ. สำหรับเป็นกุญแจค้นหายอดเงินตั้งต้น
@@ -3292,7 +3343,7 @@
               startingCash = startingCashStr ? parseFloat(startingCashStr) : 0;
             }
 
-            let netCashToSubmit = totalSales - totalTransfer; // ยอดนำส่งสุทธิ (ยอดขายรวม ลบ ยอดโอน)
+            let netCashToSubmit = totalSales - totalTransfer - totalDebt; // ยอดนำส่งสุทธิ (หักลบยอดโอน และยอดลูกหนี้)
             let totalCashInDrawer = netCashToSubmit + startingCash; // ยอดเงินสดที่ต้องมีในลิ้นชักจริงๆ
 
             html += `<h3 style="text-align:center; color: #e74c3c;">รายงานยอดเงินแคชเชียร์</h3>`;
@@ -3303,6 +3354,7 @@
             html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>1. ยอดจำนวนบิลรวมทั้งหมดจากการขาย:</strong></td><td style="text-align:right;">${totalBills.toLocaleString()} บิล</td></tr>`;
             html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>2. ยอดเงินรวมทั้งหมดจากการขาย:</strong></td><td style="text-align:right; color: #2980b9; font-weight: bold;">${totalSales.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
             html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>3. ยอดจำนวนโอน ทั้งหมดจากการขาย:</strong></td><td style="text-align:right; color: #7f8c8d;">${totalTransfer.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
+            html += `<tr style="border-bottom: 1px solid #eee; background-color: #f8f9f9;"><td><strong>3.5 ยอดลูกหนี้ (ค้างชำระ) ทั้งหมดจากการขาย:</strong></td><td style="text-align:right; color: #e67e22; font-weight: bold;">${totalDebt.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
             html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>4. ยอดจำนวนเงินสด ทั้งหมดจากการขาย:</strong></td><td style="text-align:right;">${netCashToSubmit.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
             
             let isSingleDay = startDateStr && endDateStr && (startDateStr === endDateStr);
@@ -3388,11 +3440,235 @@
                      </table></div>`;
                      
             grandTotalAll = totalAllBills;
+          } else if (type === "master_financial") {
+            // [Lilin Additive 2026-08-17] Financial Master Report Phase 1
+            let totalCashIncome = 0;
+            let totalTransferIncome = 0;
+            let totalDebtIncurred = 0; // [Lilin Phase 2]
+            
+            filteredSales.forEach((row) => {
+              let ci = parseFloat(String(row[2]).replace(/,/g, "")) || 0; // รับเงินสด
+              let cd = parseFloat(String(row[3]).replace(/,/g, "")) || 0; // เงินทอน
+              let actualCash = ci - cd; // เงินสดรับจริงสุทธิ
+              if (actualCash > 0) totalCashIncome += actualCash;
+              
+              let tr = parseFloat(String(row[6]).replace(/,/g, "")) || 0; // ยอดโอน
+              totalTransferIncome += tr;
+              
+              let dbt = parseFloat(String(row[7]).replace(/,/g, "")) || 0; // ยอดลูกหนี้
+              totalDebtIncurred += dbt;
+            });
+            
+            html += `<h3 style="text-align:center; color: #d4af37; font-size: 24px; text-shadow: 1px 1px 2px #aaa; margin-top: 10px;">💎 กระดานสรุปการเงินระดับผู้บริหาร 💎</h3>`;
+            html += `<p style="text-align:center; font-size:14px; margin-bottom: 20px;">${dateRangeText}</p>`;
+            
+            // Dashboard Container
+            html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">`;
+            
+            // 1. Cash Card
+            html += `
+              <div style="background: linear-gradient(135deg, #27ae60, #2ecc71); border-radius: 10px; padding: 20px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h4 style="margin: 0 0 10px 0; font-size: 18px;">💵 1. กระแสเงินสด (Cash)</h4>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; margin-bottom: 5px;">
+                  <span>รายรับ:</span>
+                  <span style="font-weight: bold; font-size: 18px;">${totalCashIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; margin-bottom: 5px;">
+                  <span>รายจ่าย (ลิ้นชัก):</span>
+                  <span id="master-cash-expense">กำลังโหลด...</span>
+                </div>
+              </div>
+            `;
+            
+            // 2. Transfer Card
+            html += `
+              <div style="background: linear-gradient(135deg, #2980b9, #3498db); border-radius: 10px; padding: 20px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h4 style="margin: 0 0 10px 0; font-size: 18px;">📱 2. เงินโอน (Transfer)</h4>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; margin-bottom: 5px;">
+                  <span>รายรับ:</span>
+                  <span style="font-weight: bold; font-size: 18px;">${totalTransferIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; margin-bottom: 5px;">
+                  <span>รายจ่าย:</span>
+                  <span id="master-transfer-expense">กำลังโหลด...</span>
+                </div>
+              </div>
+            `;
+            
+            // 3. Debtors Card
+            html += `
+              <div style="background: linear-gradient(135deg, #e67e22, #f39c12); border-radius: 10px; padding: 20px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h4 style="margin: 0 0 10px 0; font-size: 18px;">📒 3. ลูกหนี้ (Debtors)</h4>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; margin-bottom: 5px;">
+                  <span>ยอดหนี้ใหม่ (หนี้เพิ่ม):</span>
+                  <span style="font-weight: bold; font-size: 18px;">${totalDebtIncurred.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; margin-bottom: 5px;">
+                  <span>ยอดรับชำระหนี้ (ได้คืน):</span>
+                  <span id="master-debt-paid" style="font-weight: bold; font-size: 18px; color: #ecf0f1;">กำลังโหลด...</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; margin-bottom: 5px; background: rgba(0,0,0,0.1); padding: 5px; border-radius: 3px;">
+                  <span>ยอดค้างรวมทั้งหมด:</span>
+                  <span id="master-debt-total-outstanding" style="font-weight: bold; font-size: 18px; color: #c0392b;">กำลังโหลด...</span>
+                </div>
+              </div>
+            `;
+            
+            // 4. Creditors Card
+            html += `
+              <div style="background: linear-gradient(135deg, #8e44ad, #9b59b6); border-radius: 10px; padding: 20px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h4 style="margin: 0 0 10px 0; font-size: 18px;">🚚 4. เจ้าหนี้ (Creditors)</h4>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;">
+                  <span>ยอดหนี้สะสมทั้งหมด (ค้างจ่าย):</span>
+                  <strong id="rep-creditor-total-all" style="font-size: 16px;">0.00</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; color: #ffeaa7;">
+                  <span>ยอดเกิดหนี้ใหม่ (ตามช่วงวันที่):</span>
+                  <strong id="rep-creditor-incurred" style="font-size: 16px;">0.00</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; color: #55efc4;">
+                  <span>ยอดจ่ายชำระคืน (ตามช่วงวันที่):</span>
+                  <strong id="rep-creditor-paid" style="font-size: 16px;">0.00</strong>
+                </div>
+                <div style="text-align: center; font-size: 12px; margin-top: 10px; opacity: 0.8;">
+                  *ยอดจ่ายชำระคืน จะถูกนำไปหักออกจากกำไรสุทธิ (เงินสดออก)
+                </div>
+              </div>
+            `;
+            
+            // End Grid
+            html += `</div>`;
+            
+            // 5. Profit/Loss Card (Full width at bottom)
+            html += `
+              <div style="background: linear-gradient(135deg, #34495e, #2c3e50); border-radius: 10px; padding: 20px; color: white; margin-top: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h4 style="margin: 0 0 5px 0; font-size: 18px; color: #ecf0f1;">🌟 5. กำไรสุทธิ (Net Profit)</h4>
+                <div style="font-size: 14px; color: #bdc3c7;">(คำนวณจากยอดสุทธิทั้งหมด)</div>
+                <div style="font-size: 32px; font-weight: bold; margin-top: 10px; color: #f1c40f;">
+                  <span id="master-net-profit">กำลังคำนวณ...</span>
+                </div>
+              </div>
+            `;
+            
+            // 🛠️ [Lilin Additive Phase 1.5 & 2] Asynchronous Data Fetching for Expenses & Debt
+            if (typeof database !== "undefined") {
+                 let expReq = database.ref("erp_db_expenses").once("value");
+                 let debtReq = database.ref("erp_db_debt_payments").once("value");
+                 let custReq = database.ref("erp_db_customer").once("value");
+                 // [Lilin Phase 3] Creditor Requests
+                 let creditorReq = database.ref("erp_db_creditors").once("value");
+                 let creditorPayReq = database.ref("erp_db_creditor_payments").once("value");
+
+                 Promise.all([expReq, debtReq, custReq, creditorReq, creditorPayReq]).then((snapshots) => {
+                     let expSnap = snapshots[0].val() || {};
+                     let debtSnap = snapshots[1].val() || {};
+                     let custSnap = snapshots[2].val() || {};
+                     let creditorSnap = snapshots[3].val() || {};
+                     let creditorPaySnap = snapshots[4].val() || {};
+                     
+                     let totalExpense = 0;
+                     for (let billNo in expSnap) {
+                         let exp = expSnap[billNo];
+                         if (exp.date) {
+                             let expDate = new Date(exp.date);
+                             if (expDate >= startObj && expDate <= endObj) {
+                                 totalExpense += parseFloat(exp.grandTotal) || 0;
+                             }
+                         }
+                     }
+                     
+                     let totalDebtPaid = 0;
+                     for (let payId in debtSnap) {
+                         let payment = debtSnap[payId];
+                         if (payment.timestamp) {
+                             let pDate = new Date(payment.timestamp);
+                             if (pDate >= startObj && pDate <= endObj) {
+                                 totalDebtPaid += parseFloat(payment.amount) || 0;
+                             }
+                         }
+                     }
+                     
+                     let totalOutstandingAll = 0;
+                     for (let cId in custSnap) {
+                         totalOutstandingAll += parseFloat(custSnap[cId].outstandingDebt) || 0;
+                     }
+                     
+                     // [Lilin Phase 3] Process Creditor Payments
+                     let totalCreditorIncurred = 0;
+                     let totalCreditorPaid = 0;
+                     if (creditorPaySnap) {
+                         for (let payId in creditorPaySnap) {
+                             let cp = creditorPaySnap[payId];
+                             if (cp.date) {
+                                 let cpDate = new Date(cp.date);
+                                 if (cpDate >= startObj && cpDate <= endObj) {
+                                     if (cp.type === "incur") totalCreditorIncurred += parseFloat(cp.amount) || 0;
+                                     if (cp.type === "pay") totalCreditorPaid += parseFloat(cp.amount) || 0;
+                                 }
+                             }
+                         }
+                     }
+                     
+                     let totalCreditorDebtAll = 0;
+                     if (creditorSnap) {
+                         for (let sName in creditorSnap) {
+                             totalCreditorDebtAll += parseFloat(creditorSnap[sName].outstandingDebt) || 0;
+                         }
+                     }
+
+                     // Update the DOM dynamically after rendering
+                     setTimeout(() => {
+                        let cashExpenseEl = document.getElementById("master-cash-expense");
+                        let transferExpenseEl = document.getElementById("master-transfer-expense");
+                        let netProfitEl = document.getElementById("master-net-profit");
+                        let debtPaidEl = document.getElementById("master-debt-paid");
+                        let debtOutEl = document.getElementById("master-debt-total-outstanding");
+                        
+                        let cTotalAllEl = document.getElementById("rep-creditor-total-all");
+                        let cIncurEl = document.getElementById("rep-creditor-incurred");
+                        let cPaidEl = document.getElementById("rep-creditor-paid");
+                        
+                        if (debtPaidEl) debtPaidEl.innerHTML = totalDebtPaid.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                        if (debtOutEl) debtOutEl.innerHTML = totalOutstandingAll.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                        
+                        if (cTotalAllEl) cTotalAllEl.innerHTML = totalCreditorDebtAll.toLocaleString(undefined, { minimumFractionDigits: 2 }) + " บาท";
+                        if (cIncurEl) cIncurEl.innerHTML = totalCreditorIncurred.toLocaleString(undefined, { minimumFractionDigits: 2 }) + " บาท";
+                        if (cPaidEl) cPaidEl.innerHTML = totalCreditorPaid.toLocaleString(undefined, { minimumFractionDigits: 2 }) + " บาท";
+                        
+                        if (cashExpenseEl && transferExpenseEl && netProfitEl) {
+                            let combinedExpense = totalExpense + totalCreditorPaid;
+                            
+                            cashExpenseEl.innerHTML = `<span style="color: #ffcccc; font-weight: bold;">${totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>`;
+                            transferExpenseEl.innerHTML = `<span>0.00</span>`;
+                            
+                            // กำไรสุทธิ = (ยอดขายเงินสด + โอน + รับชำระหนี้(ลูกค้า)) - (รายจ่ายทั่วไป + จ่ายหนี้(เจ้าหนี้))
+                            let totalIncome = totalCashIncome + totalTransferIncome + totalDebtPaid;
+                            let netProfit = totalIncome - combinedExpense;
+                            
+                            let profitColor = netProfit >= 0 ? "#2ecc71" : "#e74c3c";
+                            netProfitEl.innerHTML = `<span style="color: ${profitColor};">${netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</span>`;
+                            
+                            if (totalCreditorPaid > 0) {
+                                cashExpenseEl.innerHTML += `<br><small style="color: #55efc4; font-size: 11px;">(+ จ่ายหนี้: ${totalCreditorPaid.toLocaleString(undefined, {minimumFractionDigits:2})})</small>`;
+                            }
+                        }
+                     }, 100);
+                 }).catch(function(err) {
+                     console.error("Error fetching Phase 2 data:", err);
+                     setTimeout(() => {
+                         document.getElementById("master-cash-expense").innerHTML = "<small>[Error]</small>";
+                         document.getElementById("master-net-profit").innerHTML = "<small>[Error]</small>";
+                     }, 100);
+                 });
+            }
+            
+            // Setting a fake grandTotalAll so it doesn't trigger "No Data" message below
+            grandTotalAll = 1;
           }
 
           // 🛠️ [ADDITIVE] ปลดล็อกให้รายงานแคชเชียร์และบิลสามารถแสดงผลได้ แม้วันนั้นยังไม่มีบิลขายเลยก็ตาม
           if (
-            type !== "cashier" && type !== "bill" &&
+            type !== "cashier" && type !== "bill" && type !== "master_financial" &&
             (filteredSales.length === 0 || grandTotalAll === 0)
           ) {
             html = `<p style="text-align:center; color: #7f8c8d; font-style:italic; padding: 30px;">ไม่พบข้อมูลการขายในช่วงวันที่ที่เลือก หรือข้อมูลเก่าไม่มีการแยกสินค้า (Backward Compatibility)</p>`;
@@ -3745,6 +4021,19 @@
         </div>
       </div>
 
+      <!-- [Lilin] Audit Log Modal -->
+      <div id="ipaq-audit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:600px; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; max-height:80vh;">
+          <div style="background:#8e44ad; color:white; padding:15px; font-size:18px; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+            <span>📝 ประวัติความเคลื่อนไหวประจำวัน</span>
+            <button onclick="closeIpaqAuditModal()" style="background:transparent; border:none; color:white; font-size:20px; cursor:pointer;">✖</button>
+          </div>
+          <div id="ipaq-audit-list" style="padding:15px; overflow-y:auto; flex:1; background:#f9f9f9;">
+             <!-- Logs will be injected here -->
+          </div>
+        </div>
+      </div>
+
       <!-- IPAQ Main Interface -->
       <div class="ipaq-container">
         <!-- Left: Table Grid -->
@@ -3769,6 +4058,22 @@
                 "
               >
                 💸 คีย์ค่าใช้จ่าย
+              </button>
+              <button
+                onclick="openIpaqAuditModal()"
+                style="
+                  font-size: 12px;
+                  padding: 5px 10px;
+                  background: #8e44ad;
+                  color: white;
+                  border: none;
+                  border-radius: 5px;
+                  cursor: pointer;
+                  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                  white-space: nowrap;
+                "
+              >
+                📝 ประวัติลบบิล
               </button>
               <button
                 onclick="
@@ -3965,6 +4270,9 @@
              <input type="text" id="ipaq-menu-search" placeholder="🔍 ค้นหาชื่อเมนู อาหารและเครื่องดื่ม..." onkeyup="filterIpaqMenu()" style="flex: 1; padding: 6px; font-size: 14px; border-radius: 8px; border: 2px solid #3498db; outline: none;">
              <button onclick="finishAndPrintKitchen('all')" style="padding: 6px 15px; font-size: 14px; font-weight: bold; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">✅ พิมพ์อาหารเครื่องดื่ม</button>
           </div>
+          <!-- Category Tabs Added by Lilin -->
+          <div class="ipaq-category-scroll" id="ipaq-category-container"></div>
+          
           <div class="ipaq-menu-grid" id="ipaq-menu-grid"></div>
         </div>
       </div>
@@ -4024,32 +4332,52 @@
           />
         </div>
 
-        <select
-          id="inventory-mode-select"
-          onchange="switchInventoryMode()"
-          style="
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 2px solid var(--accent-blue);
-            font-family: &quot;Prompt&quot;, sans-serif;
-            font-size: 15px;
-            font-weight: bold;
-            color: var(--accent-blue);
-            outline: none;
-            background: #fff;
-            cursor: pointer;
-            min-width: 280px;
-          "
-        >
-          <option value="manage_db">🔧 1. จัดการข้อมูลสินค้าพื้นฐาน</option>
-          <option value="receive_bill">
-            📥 2. คีย์รับสินค้าเข้า (ตามบิลผู้จำหน่าย)
-          </option>
-          <option value="adjust_stock">
-            ⚖️ 3. ปรับยอดสต๊อก / เบิก / ยืม / จ่าย
-          </option>
-          <option value="report_stock">📊 4. รายงานความเคลื่อนไหวสต๊อก</option>
-        </select>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <select
+            id="inventory-mode-select"
+            onchange="switchInventoryMode()"
+            style="
+              padding: 10px 15px;
+              border-radius: 8px;
+              border: 2px solid var(--accent-blue);
+              font-family: &quot;Prompt&quot;, sans-serif;
+              font-size: 15px;
+              font-weight: bold;
+              color: var(--accent-blue);
+              outline: none;
+              background: #fff;
+              cursor: pointer;
+              min-width: 280px;
+            "
+          >
+            <option value="manage_db">🔧 1. จัดการข้อมูลสินค้าพื้นฐาน</option>
+            <option value="receive_bill">
+              📥 2. คีย์รับสินค้าเข้า (ตามบิลผู้จำหน่าย)
+            </option>
+            <option value="adjust_stock">
+              ⚖️ 3. ปรับยอดสต๊อก / เบิก / ยืม / จ่าย
+            </option>
+            <option value="report_stock">📊 4. รายงานความเคลื่อนไหวสต๊อก</option>
+          </select>
+          <button
+            onclick="document.getElementById('creditor-modal').style.display = 'block'; renderCreditorTable();"
+            style="
+              padding: 10px 15px;
+              border-radius: 8px;
+              border: none;
+              background: #e74c3c;
+              color: white;
+              font-family: 'Prompt', sans-serif;
+              font-size: 15px;
+              font-weight: bold;
+              cursor: pointer;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+              white-space: nowrap;
+            "
+          >
+            🚚 จัดการเจ้าหนี้
+          </button>
+        </div>
       </div>
 
       <!-- Mode 2: Receive Bill (New Form) -->
@@ -4099,6 +4427,16 @@
               id="bill-note"
               placeholder="รายละเอียดอื่นๆ..."
             />
+          </div>
+
+          <div style="margin-bottom: 15px; display: flex; gap: 15px; align-items: center; background: #fdfefe; padding: 10px; border-radius: 8px; border: 1px solid #ecf0f1;">
+            <label style="font-weight: bold; margin: 0;">ประเภทการชำระเงิน:</label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <input type="radio" name="bill-payment-type" value="cash" checked /> 💵 จ่ายเงินสด (หักจากลิ้นชัก)
+            </label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <input type="radio" name="bill-payment-type" value="credit" /> 📝 ค้างชำระ (บันทึกเป็นเจ้าหนี้)
+            </label>
           </div>
 
           <div
@@ -4731,6 +5069,7 @@
               <th>ส่วนลด</th>
               <th>แต้ม</th>
               <th>ยอดสะสม</th>
+              <th>ยอดค้างชำระ</th>
               <th>วงเงิน</th>
               <th>จัดการ</th>
             </tr>
@@ -5644,6 +5983,21 @@
           const currentPrice = priceInput ? parseFloat(priceInput.value) || 0 : 0;
           const currentNote = noteInput ? noteInput.value : "";
 
+          if (typeof window.addQuickNote === "undefined") {
+              window.addQuickNote = function(inputId, noteText) {
+                  let el = document.getElementById(inputId);
+                  if (el) {
+                      let currentVal = el.value.trim();
+                      if (currentVal) {
+                          el.value = currentVal + " " + noteText;
+                      } else {
+                          el.value = noteText;
+                      }
+                      el.focus();
+                  }
+              };
+          }
+
           if (typeof Swal !== "undefined") {
               Swal.fire({
                   title: 'แก้ไข: ' + currentName,
@@ -5655,6 +6009,11 @@
                       <div style="text-align: left; font-weight: bold;">
                           <label>หมายเหตุ:</label>
                           <input id="swal-main-note" class="swal2-input" type="text" placeholder="เช่น ไม่เผ็ด, หวานน้อย" value="${currentNote}">
+                          <div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px; flex-wrap: wrap; justify-content: center;">
+                              <span onclick="addQuickNote('swal-main-note', '🔥ออกครัว')" style="background: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🔥ออกครัว</span>
+                              <span onclick="addQuickNote('swal-main-note', '🎵ขอเพลง')" style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🎵ขอเพลง</span>
+                              <span onclick="addQuickNote('swal-main-note', '🙋เรียกพนักงาน')" style="background: #f1c40f; color: black; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🙋เรียกพนักงาน</span>
+                          </div>
                       </div>
                   `,
                   showCancelButton: true,
@@ -8540,9 +8899,13 @@
         }
 
         // Write to Firebase
+        // [Lilin Fix] Preserve existing data fields like outstandingDebt by merging
+        let existingData = (window.erpData && window.erpData[type] && window.erpData[type][id]) ? window.erpData[type][id] : {};
+        let finalData = Object.assign({}, existingData, data);
+
         database
           .ref("erp_db_" + type + "/" + id)
-          .set(data)
+          .set(finalData)
           .then(() => {
             // [Lilin Additive] Sync Product Manage DB to Inventory DB to link everything seamlessly!
             if (type === "product") {
@@ -8715,7 +9078,12 @@
             if (type === "customer") {
               let discText =
                 fmt(row.discountVal || "0") + " " + (row.discountType || "%");
-              tr.innerHTML = `<td>${row.id}</td><td>${row.name}</td><td>${row.level || "ทั่วไป"}</td><td>${row.phone}</td><td>${discText}</td><td>${fmt(row.points)}</td><td>${fmt(row.totalSpent, true)}</td><td>${fmt(row.credit, true)}</td><td>${actionBtns}</td>`;
+              let debtAmt = parseFloat(row.outstandingDebt) || 0;
+              let debtDisplay = `<span style="color:red; font-weight:bold;">${fmt(debtAmt, true)}</span>`;
+              if (debtAmt > 0) {
+                 debtDisplay += ` <button onclick="openPayDebtModal('${row.id}', '${row.name}', ${debtAmt})" style="margin-left:5px; padding:2px 5px; background:#2ecc71; color:white; border:none; border-radius:3px; cursor:pointer; font-size:11px;">💵 ชำระหนี้</button>`;
+              }
+              tr.innerHTML = `<td>${row.id}</td><td>${row.name}</td><td>${row.level || "ทั่วไป"}</td><td>${row.phone}</td><td>${discText}</td><td>${fmt(row.points)}</td><td>${fmt(row.totalSpent, true)}</td><td>${debtDisplay}</td><td>${fmt(row.credit, true)}</td><td>${actionBtns}</td>`;
             }
             if (type === "printer") {
               tr.innerHTML = `<td>${row.id}</td><td>${row.type}</td><td>${row.role}</td><td>${actionBtns}</td>`;
@@ -9827,6 +10195,21 @@
             return;
         }
 
+        // [Lilin Phase 3] Determine Payment Type
+        let paymentType = "cash";
+        const paymentRadios = document.getElementsByName("bill-payment-type");
+        for (let radio of paymentRadios) {
+           if (radio.checked) {
+              paymentType = radio.value;
+              break;
+           }
+        }
+        
+        if (paymentType === "credit" && !billSupplier) {
+           alert("⚠️ หากเลือกการชำระเป็น 'ค้างชำระ' กรุณาระบุชื่อผู้จำหน่าย/ร้านค้า ด้วยค่ะ เพื่อให้บันทึกเจ้าหนี้ได้ถูกต้อง");
+           return;
+        }
+
         const timestamp = billDate
           ? getLocalISOString(new Date(billDate))
           : getLocalISOString(getBusinessDate());
@@ -9912,7 +10295,51 @@
 
         saveStockLedger();
 
-        alert("✅ บันทึกบิลรับเข้าเรียบร้อย! สต๊อกสินค้าอัปเดตแล้ว");
+        // [Lilin Phase 3] Calculate grandTotal for Expense/Creditor Logic
+        let grandTotal = 0;
+        currentBillItems.forEach(item => {
+           grandTotal += (parseFloat(item.totalCost) || 0); 
+        });
+
+        // [Lilin Phase 3] Handle Expense or Creditor
+        if (paymentType === "cash") {
+            var now = new Date();
+            var expBillNo = "EXP-" + Date.now();
+            var expenseData = {
+              billNo: expBillNo,
+              date: getLocalISOString(now),
+              items: [{name: "รับสินค้าเข้าสต็อก (" + receiptRef + ")", qty: 1, price: grandTotal, total: grandTotal}],
+              grandTotal: grandTotal,
+              createdBy: "แคชเชียร์ (รับสินค้า)"
+            };
+            if (typeof database !== "undefined") {
+              database.ref("erp_db_expenses/" + expBillNo).set(expenseData).catch(err => console.error(err));
+            }
+            alert("✅ บันทึกรับสินค้าและตัดเงินสดจากลิ้นชัก (รายจ่าย) เรียบร้อยแล้ว\nหักเงินออก: " + grandTotal.toLocaleString(undefined, {minimumFractionDigits:2}) + " บาท");
+        } else if (paymentType === "credit") {
+            if (typeof database !== "undefined") {
+              database.ref("erp_db_creditors/" + billSupplier).once("value").then(snap => {
+                  let currentDebt = snap.val() ? (parseFloat(snap.val().outstandingDebt) || 0) : 0;
+                  let newDebt = currentDebt + grandTotal;
+                  database.ref("erp_db_creditors/" + billSupplier).set({
+                      supplierName: billSupplier,
+                      outstandingDebt: newDebt,
+                      lastUpdate: getLocalISOString(new Date())
+                  });
+              });
+              let ts = Date.now();
+              database.ref("erp_db_creditor_payments/INV_" + ts).set({
+                 type: "incur",
+                 supplierName: billSupplier,
+                 amount: grandTotal,
+                 date: getLocalISOString(new Date()),
+                 note: receiptRef
+              });
+            }
+            alert("✅ บันทึกรับสินค้าและตั้งยอดเจ้าหนี้ (" + billSupplier + ") เรียบร้อยแล้ว\nตั้งหนี้ใหม่: " + grandTotal.toLocaleString(undefined, {minimumFractionDigits:2}) + " บาท");
+        } else {
+            alert("✅ บันทึกบิลรับเข้าเรียบร้อย! สต๊อกสินค้าอัปเดตแล้ว");
+        }
 
         // Clear Form
         document.getElementById("bill-no").value = "";
@@ -10237,6 +10664,9 @@
             return;
           }
           ipaqLoggedIn = true;
+          window.currentIpaqRole = "admin";
+          window.currentIpaqStaffId = "admin";
+          window.currentIpaqStaffName = "ผู้ดูแลระบบ (Admin)";
           document.getElementById("ipaq-login-overlay").style.display = "none";
           initIpaq();
           return;
@@ -10252,6 +10682,9 @@
               // อนุโลมให้เข้าได้ถ้ารหัสตรงกัน หรือ เป็นพนักงานเก่าที่ไม่มีรหัสผ่าน (ใช้ 1234 แทน)
               if (user.password === pwd || (!user.password && pwd === "1234")) {
                 ipaqLoggedIn = true;
+                window.currentIpaqRole = user.role || "staff";
+                window.currentIpaqStaffId = userId;
+                window.currentIpaqStaffName = user.name || userId;
                 document.getElementById("ipaq-login-overlay").style.display =
                   "none";
                 initIpaq();
@@ -10268,6 +10701,91 @@
             err.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล";
             err.style.display = "block";
           });
+      }
+
+      function scanIpaqQR(qrCode) {
+          let inputEl = document.getElementById("ipaq-qr-scanner");
+          if (inputEl) inputEl.value = "";
+          if (!qrCode) return;
+          
+          let cleanQr = qrCode.trim();
+          database.ref("erp_db_employee").once("value").then(snap => {
+              if (snap.exists()) {
+                  let emps = snap.val();
+                  let foundUser = null;
+                  let foundId = null;
+                  
+                  // search by id or qr match
+                  for (let key in emps) {
+                      if (key === cleanQr || (emps[key].staffCode && emps[key].staffCode === cleanQr) || key.toUpperCase() === cleanQr.toUpperCase()) {
+                          foundUser = emps[key];
+                          foundId = key;
+                          break;
+                      }
+                  }
+                  
+                  if (foundUser) {
+                      ipaqLoggedIn = true;
+                      window.currentIpaqRole = foundUser.role || "staff";
+                      window.currentIpaqStaffId = foundId;
+                      window.currentIpaqStaffName = foundUser.name || foundId;
+                      document.getElementById("ipaq-login-overlay").style.display = "none";
+                      initIpaq();
+                      if (typeof Swal !== "undefined") {
+                          Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: '✅ เข้าสู่ระบบสำเร็จ: ' + foundUser.name, showConfirmButton: false, timer: 2000 });
+                      }
+                  } else {
+                      alert("❌ ไม่พบ QR Code พนักงานนี้ในระบบ");
+                  }
+              }
+          });
+      }
+      
+      // [Lilin Added] Function to save audit log for Waiter Actions
+      function saveIpaqAuditLog(action, details) {
+        if (!window.currentIpaqStaffId) return;
+        const logRef = database.ref("erp_db_audit_log").push();
+        logRef.set({
+          timestamp: Date.now(),
+          date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+          staffId: window.currentIpaqStaffId,
+          staffName: window.currentIpaqStaffName || window.currentIpaqStaffId,
+          action: action,
+          details: details
+        }).catch(err => console.error("Error saving audit log", err));
+      }
+      
+      function openIpaqAuditModal() {
+          document.getElementById("ipaq-audit-modal").style.display = "flex";
+          const list = document.getElementById("ipaq-audit-list");
+          list.innerHTML = "<div style='text-align:center;'>กำลังโหลดข้อมูล...</div>";
+          
+          let todayStr = new Date().toISOString().split('T')[0];
+          database.ref("erp_db_audit_log").orderByChild("date").equalTo(todayStr).once("value").then(snap => {
+              if (snap.exists()) {
+                  let logs = [];
+                  snap.forEach(child => { logs.push(child.val()); });
+                  logs.sort((a,b) => b.timestamp - a.timestamp); // newest first
+                  
+                  list.innerHTML = logs.map(l => {
+                      let timeStr = new Date(l.timestamp).toLocaleTimeString('th-TH');
+                      let actionColor = l.action === "DELETE" ? "red" : (l.action === "EDIT" ? "blue" : "orange");
+                      return `<div style="background:white; border-left:4px solid ${actionColor}; padding:10px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-radius:4px;">
+                          <div style="font-size:12px; color:#7f8c8d;">⏰ ${timeStr} | 👤 ${l.staffName} (${l.staffId})</div>
+                          <div style="font-size:14px; font-weight:bold; margin-top:5px; color:#2c3e50;">${l.details}</div>
+                      </div>`;
+                  }).join("");
+              } else {
+                  list.innerHTML = "<div style='text-align:center; color:#95a5a6;'>ไม่มีประวัติการลบ/แก้ไขในวันนี้</div>";
+              }
+          }).catch(e => {
+              list.innerHTML = "<div style='color:red; text-align:center;'>เกิดข้อผิดพลาดในการโหลดข้อมูล</div>";
+              console.error(e);
+          });
+      }
+
+      function closeIpaqAuditModal() {
+          document.getElementById("ipaq-audit-modal").style.display = "none";
       }
 
       const originalSwitchTab = window.switchTab;
@@ -10430,6 +10948,17 @@
               let tOrders = tableOrders.filter((o) => o.tableId === currentIpaqTable.id && !o.isPaid);
               if (!tOrders[index]) return;
               let orderItem = tOrders[index];
+
+              if (orderItem.isIpaqPrinted) {
+                  if (window.currentIpaqRole !== "manager" && window.currentIpaqRole !== "admin") {
+                      if (typeof Swal !== "undefined") {
+                          Swal.fire({ icon: 'error', title: 'ไม่อนุญาต', text: 'ออเดอร์นี้ถูกส่งเข้าครัวแล้ว ต้องให้ผู้จัดการหรือแคชเชียร์แก้ไขเท่านั้น' });
+                      } else {
+                          alert("⚠️ ไม่สามารถแก้ไขได้! ออเดอร์นี้ถูกส่งเข้าครัวแล้ว (ต้องให้ผู้จัดการ/แคชเชียร์แก้ไขเท่านั้น)");
+                      }
+                      return;
+                  }
+              }
               
               let pDB = typeof window.productDB !== "undefined" ? window.productDB : (typeof products !== "undefined" ? products : null);
               let prodSku = "";
@@ -10461,6 +10990,11 @@
                           <div style="text-align: left; font-weight: bold;">
                               <label>หมายเหตุ:</label>
                               <input id="swal-input-note" class="swal2-input" type="text" placeholder="เช่น ไม่เผ็ด, หวานน้อย" value="${orderItem.note || ''}">
+                              <div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px; flex-wrap: wrap; justify-content: center;">
+                                  <span onclick="addQuickNote('swal-input-note', '🔥ออกครัว')" style="background: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🔥ออกครัว</span>
+                                  <span onclick="addQuickNote('swal-input-note', '🎵ขอเพลง')" style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🎵ขอเพลง</span>
+                                  <span onclick="addQuickNote('swal-input-note', '🙋เรียกพนักงาน')" style="background: #f1c40f; color: black; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🙋เรียกพนักงาน</span>
+                              </div>
                           </div>
                       `,
                       showCancelButton: true,
@@ -10540,6 +11074,10 @@ function _fallbackPromptEdit(orderItem) {
               if (typeof saveIpaqState === "function") saveIpaqState();
               if (typeof renderIpaqBill === "function") renderIpaqBill();
               if (typeof ipaqSyncTableToGlobalOrders === "function") ipaqSyncTableToGlobalOrders(currentIpaqTable.id);
+              
+              if (tableOrders[globalIndex].isIpaqPrinted) {
+                  saveIpaqAuditLog("EDIT", "แก้ไขออเดอร์: " + tableOrders[globalIndex].name + " (โต๊ะ: " + currentIpaqTable.name + ") -> ราคา:" + newPrice + " หมายเหตุ:" + newNote);
+              }
           }
       }
 
@@ -10856,6 +11394,11 @@ function _fallbackPromptEdit(orderItem) {
                         <div style="text-align: left; font-weight: bold;">
                             <label>หมายเหตุ:</label>
                             <input id="swal-custom-note" class="swal2-input" type="text" placeholder="เช่น ไม่เผ็ด, หวานน้อย" value="">
+                            <div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px; flex-wrap: wrap; justify-content: center;">
+                                <span onclick="addQuickNote('swal-custom-note', '🔥ออกครัว')" style="background: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🔥ออกครัว</span>
+                                <span onclick="addQuickNote('swal-custom-note', '🎵ขอเพลง')" style="background: #9b59b6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🎵ขอเพลง</span>
+                                <span onclick="addQuickNote('swal-custom-note', '🙋เรียกพนักงาน')" style="background: #f1c40f; color: black; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer;">🙋เรียกพนักงาน</span>
+                            </div>
                         </div>
                     `,
                     showCancelButton: true,
@@ -10988,13 +11531,20 @@ function _fallbackPromptEdit(orderItem) {
         }
       }
 
+      let currentIpaqCategory = "ทั้งหมด";
+
       function filterIpaqMenu() {
         const query = document.getElementById("ipaq-menu-search").value.toLowerCase();
         const items = document.getElementById("ipaq-menu-grid").children;
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
           const name = item.getAttribute("data-name");
-          if (name && name.includes(query)) {
+          const cat = item.getAttribute("data-category");
+          
+          let matchesSearch = name && name.includes(query);
+          let matchesCategory = (currentIpaqCategory === "ทั้งหมด") || (cat === currentIpaqCategory);
+
+          if (matchesSearch && matchesCategory) {
             item.style.display = "";
           } else {
             item.style.display = "none";
@@ -11007,6 +11557,31 @@ function _fallbackPromptEdit(orderItem) {
           `สั่งอาหาร = ${currentIpaqTable.name}`;
         const searchInput = document.getElementById("ipaq-menu-search");
         if(searchInput) searchInput.value = "";
+        
+        // 1. Build Categories
+        let cats = new Set();
+        products.forEach(p => {
+            if(p.category && p.category !== '-') cats.add(p.category);
+        });
+        let catArray = ["ทั้งหมด", ...Array.from(cats)];
+        
+        const catContainer = document.getElementById("ipaq-category-container");
+        if (catContainer) {
+            catContainer.innerHTML = "";
+            catArray.forEach(cat => {
+                const btn = document.createElement("button");
+                btn.className = `ipaq-category-btn ${cat === currentIpaqCategory ? 'active' : ''}`;
+                btn.innerText = cat;
+                btn.onclick = () => {
+                    currentIpaqCategory = cat;
+                    Array.from(catContainer.children).forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    filterIpaqMenu();
+                };
+                catContainer.appendChild(btn);
+            });
+        }
+        
         filterIpaqMenu();
         const grid = document.getElementById("ipaq-menu-grid");
         grid.innerHTML = "";
@@ -11015,6 +11590,7 @@ function _fallbackPromptEdit(orderItem) {
           let item = document.createElement("div");
           item.className = "ipaq-menu-item";
           item.setAttribute("data-name", p.name.toLowerCase());
+          item.setAttribute("data-category", p.category || "ไม่ระบุ");
           // We remove the onclick from the whole card to prevent accidental clicks when adjusting qty
 
           let cat = p.category || "";
@@ -11041,6 +11617,11 @@ function _fallbackPromptEdit(orderItem) {
                 <button onclick="changeIpaqTempQty('${p.id}', 1)" style="flex:1; height:28px; font-size:18px; font-weight:bold; border-radius:0 3px 3px 0; border:none; background:linear-gradient(145deg, #2ecc71, #27ae60); color:white; cursor:pointer; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); padding:0; margin:0; display:flex; align-items:center; justify-content:center; box-sizing:border-box;">+</button>
             </div>
             <input type="text" class="ipaq-menu-note-input" id="ipaq-temp-note-${p.id}" placeholder="หมายเหตุ...">
+            <div style="display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; justify-content: center;">
+                <span onclick="addQuickNote('ipaq-temp-note-${p.id}', '🔥ออกครัว')" style="background: #e74c3c; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; cursor: pointer;">🔥ออกครัว</span>
+                <span onclick="addQuickNote('ipaq-temp-note-${p.id}', '🎵ขอเพลง')" style="background: #9b59b6; color: white; padding: 2px 5px; border-radius: 3px; font-size: 11px; cursor: pointer;">🎵ขอเพลง</span>
+                <span onclick="addQuickNote('ipaq-temp-note-${p.id}', '🙋พนักงาน')" style="background: #f1c40f; color: black; padding: 2px 5px; border-radius: 3px; font-size: 11px; cursor: pointer;">🙋พนักงาน</span>
+            </div>
             <button onclick="ipaqAddOrderById('${p.id}', this)" style="width:100%; height:28px; background:linear-gradient(145deg, #3498db, #2980b9); color:white; border:none; border-radius:3px; font-size:14px; cursor:pointer; font-weight:bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3); text-shadow: 1px 1px 1px rgba(0,0,0,0.5); padding:0; display:flex; align-items:center; justify-content:center;">✅ เพิ่ม</button>
         `;
           grid.appendChild(item);
@@ -11243,7 +11824,20 @@ function _fallbackPromptEdit(orderItem) {
             !o.isPaid,
         );
         if (orderIndex !== -1) {
+          let oItem = tableOrders[orderIndex];
+          if (oItem.isIpaqPrinted) {
+              if (window.currentIpaqRole !== "manager" && window.currentIpaqRole !== "admin") {
+                  if (typeof Swal !== "undefined") {
+                      Swal.fire({ icon: 'error', title: 'ไม่อนุญาต', text: 'ออเดอร์นี้ถูกส่งเข้าครัวแล้ว ต้องให้ผู้จัดการหรือแคชเชียร์ลบเท่านั้น' });
+                  } else {
+                      alert("⚠️ ไม่สามารถลบได้! ออเดอร์นี้ถูกส่งเข้าครัวแล้ว (ต้องให้ผู้จัดการ/แคชเชียร์ลบเท่านั้น)");
+                  }
+                  return;
+              }
+          }
+
           if (confirm("ยืนยันลบรายการนี้?")) {
+            if (oItem.isIpaqPrinted) saveIpaqAuditLog("DELETE", "ลบออเดอร์: " + oItem.name + " (โต๊ะ: " + currentIpaqTable.name + ")");
             tableOrders.splice(orderIndex, 1);
             renderIpaqBill();
 
@@ -11558,18 +12152,37 @@ function _fallbackPromptEdit(orderItem) {
 
         let cashEl = document.getElementById("ipaq-cash-input");
         let transferEl = document.getElementById("ipaq-transfer-input");
+        let debtEl = document.getElementById("ipaq-debt-input");
         let bankEl = document.getElementById("ipaq-bank-input");
         let crmEl = document.getElementById("ipaq-crm-input");
 
         let cash = cashEl ? parseFloat(cashEl.value) || 0 : 0;
         let transfer = transferEl ? parseFloat(transferEl.value) || 0 : 0;
-        let totalInput = cash + transfer;
+        let debt = debtEl ? parseFloat(debtEl.value) || 0 : 0;
+        let totalInput = cash + transfer + debt;
+        let customerId = crmEl ? crmEl.value.trim() : "";
 
         if (totalInput < netTotal) {
           return alert("จำนวนเงินที่รับมาน้อยกว่ายอดสุทธิ กรุณาตรวจสอบ! ยอดสุทธิคือ " + netTotal);
         }
+        
+        if (debt > 0 && customerId === "") {
+          return alert("❌ กรุณาระบุรหัสลูกค้าในช่อง 'สมาชิกร้าน' เมื่อมีการบันทึกยอดลูกหนี้!");
+        }
 
         if (!confirm("ยืนยันรับเงินและจบบิล?")) return;
+        
+        // 🛠️ [Lilin Surgical Fix] Update Customer Outstanding Debt in CRM
+        if (debt > 0 && customerId !== "" && typeof database !== "undefined") {
+          database.ref("erp_db_customer/" + customerId).once("value").then(function(snapshot) {
+            let custData = snapshot.val();
+            if (custData) {
+              let currentDebt = parseFloat(custData.outstandingDebt) || 0;
+              custData.outstandingDebt = currentDebt + debt;
+              database.ref("erp_db_customer/" + customerId).update({ outstandingDebt: custData.outstandingDebt });
+            }
+          }).catch(e => console.error("Error updating customer debt: ", e));
+        }
 
         tOrders.forEach((o) => {
           o.isPaid = true;
@@ -11588,8 +12201,9 @@ function _fallbackPromptEdit(orderItem) {
           totalAmount: netTotal,
           cashAmount: cash,
           transferAmount: transfer,
+          debtAmount: debt,
           bankName: bankEl ? bankEl.value : "",
-          customerCrm: crmEl ? crmEl.value : "",
+          customerCrm: customerId,
           items: tOrders.map((o) => (Object.assign({}, o))),
           timestamp: getLocalISOString(getBusinessDate()),
         };
@@ -11801,7 +12415,21 @@ function _fallbackPromptEdit(orderItem) {
       function ipaqDecreaseQty(idx) {
           if (!currentIpaqTable) return;
           let existingOrder = tableOrders[idx];
+          if (!existingOrder) return;
+
+          if (existingOrder.isIpaqPrinted) {
+              if (window.currentIpaqRole !== "manager" && window.currentIpaqRole !== "admin") {
+                  if (typeof Swal !== "undefined") {
+                      Swal.fire({ icon: 'error', title: 'ไม่อนุญาต', text: 'ออเดอร์นี้ถูกส่งเข้าครัวแล้ว ต้องให้ผู้จัดการหรือแคชเชียร์จัดการเท่านั้น', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false });
+                  } else {
+                      alert("⚠️ ไม่สามารถลดจำนวนได้! ออเดอร์นี้ถูกส่งเข้าครัวแล้ว");
+                  }
+                  return;
+              }
+          }
+
           if (existingOrder && existingOrder.qty > 1 && !existingOrder.isPaid && existingOrder.tableId === currentIpaqTable.id) {
+              if (existingOrder.isIpaqPrinted) saveIpaqAuditLog("DECREASE_QTY", "ลดจำนวนออเดอร์: " + existingOrder.name + " (โต๊ะ: " + currentIpaqTable.name + ")");
               existingOrder.qty -= 1;
               existingOrder.timestamp = getLocalISOString(new Date());
               if (typeof saveIpaqState === "function") saveIpaqState();
@@ -11952,7 +12580,7 @@ function _fallbackPromptEdit(orderItem) {
             </div>
             <div style="display:flex; align-items:center; margin-bottom:5px;">
                 <span style="width:110px; color:#8e44ad; font-size:13px; font-weight:bold;">ยอดลูกหนี้:</span>
-                <input type="number" id="ipaq-debt-input" value="${prevDebt || "0"}" min="0" oninput="calcIpaqChange()" onclick="openDebtorModal()" placeholder="คลิกเลือกลูกหนี้" style="flex:1; padding:2px 4px; font-size:15px; text-align:right; border:1px solid #ccc; border-radius:5px 0 0 5px; outline:none; border-right:none; cursor:pointer;">
+                <input type="number" id="ipaq-debt-input" value="${prevDebt || "0"}" min="0" oninput="calcIpaqChange()" style="flex:1; padding:2px 4px; font-size:15px; text-align:right; border:1px solid #ccc; border-radius:5px 0 0 5px; outline:none; border-right:none;">
                 <button onclick="openDebtorModal()" style="width:110px; font-size:13px; padding:4px; background:#8e44ad; color:white; border:none; border-radius:0 5px 5px 0; cursor:pointer; font-weight:bold;">💸 เลือกลูกหนี้</button>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; font-size: 16px; font-weight: bold; color: #27ae60; padding-top:5px; border-top:1px dashed #ccc;">
@@ -12927,17 +13555,20 @@ function _fallbackPromptEdit(orderItem) {
         let totalCashInput = 0; // ยอดรวมเงินสดที่รับมา
         let totalChangeDue = 0;
         let totalTransfer = 0;
+        let totalDebt = 0;
 
         filteredSales.forEach((row) => {
           let gt = parseFloat(String(row[1]).replace(/,/g, "")) || 0;
           let ci = parseFloat(String(row[2]).replace(/,/g, "")) || 0;
           let cd = parseFloat(String(row[3]).replace(/,/g, "")) || 0;
           let tr = parseFloat(String(row[6]).replace(/,/g, "")) || 0;
+          let db = parseFloat(String(row[7]).replace(/,/g, "")) || 0;
 
           totalSales += gt;
           totalCashInput += ci;
           totalChangeDue += cd;
           totalTransfer += tr;
+          totalDebt += db;
         });
 
         let searchDate = startDateStr;
@@ -12962,7 +13593,7 @@ function _fallbackPromptEdit(orderItem) {
           startingCash = startingCashStr ? parseFloat(startingCashStr) : 0;
         }
 
-        let netCashToSubmit = totalSales - totalTransfer; // ยอดเงินสดสุทธิ
+        let netCashToSubmit = totalSales - totalTransfer - totalDebt; // 🛠️ [Lilin Surgical Fix] หักลบยอดลูกหนี้ออกจากเงินสดสุทธิ
         let totalCashInDrawer = netCashToSubmit + startingCash;
 
         let html = "";
@@ -12974,6 +13605,7 @@ function _fallbackPromptEdit(orderItem) {
         html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>1. ยอดจำนวนบิลรวมทั้งหมดจากการขาย:</strong></td><td style="text-align:right;">${totalBills.toLocaleString()} บิล</td></tr>`;
         html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>2. ยอดเงินรวมทั้งหมดจากการขาย:</strong></td><td style="text-align:right; color: #2980b9; font-weight: bold;">${totalSales.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
         html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>3. ยอดจำนวนโอน ทั้งหมดจากการขาย:</strong></td><td style="text-align:right; color: #7f8c8d;">${totalTransfer.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
+        html += `<tr style="border-bottom: 1px solid #eee; background-color: #f8f9f9;"><td><strong>3.5 ยอดลูกหนี้ (ค้างชำระ) ทั้งหมดจากการขาย:</strong></td><td style="text-align:right; color: #e67e22; font-weight: bold;">${totalDebt.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
         html += `<tr style="border-bottom: 1px solid #eee;"><td><strong>4. ยอดจำนวนเงินสด ทั้งหมดจากการขาย:</strong></td><td style="text-align:right;">${netCashToSubmit.toLocaleString(undefined, { minimumFractionDigits: 2 })} บาท</td></tr>`;
         
         if (isSingleDay) {
@@ -13102,15 +13734,33 @@ function _fallbackPromptEdit(orderItem) {
         let bankEl = document.getElementById("ipaq-bank-input");
         let crmEl = document.getElementById("ipaq-crm-input");
 
+        let debtEl = document.getElementById("ipaq-debt-input");
         let cash = cashEl ? parseFloat(cashEl.value) || 0 : 0;
         let transfer = transferEl ? parseFloat(transferEl.value) || 0 : 0;
-        let totalInput = cash + transfer;
+        let debt = debtEl ? parseFloat(debtEl.value) || 0 : 0;
+        let totalInput = cash + transfer + debt;
+        let customerId = crmEl ? crmEl.value.trim() : "";
 
         if (totalInput < netTotal) {
           return alert("จำนวนเงินที่รับมาน้อยกว่ายอดสุทธิ กรุณาตรวจสอบ! ยอดสุทธิคือ " + netTotal.toLocaleString("en-US", { minimumFractionDigits: 2 }));
         }
 
+        if (debt > 0 && customerId === "") {
+          return alert("❌ กรุณาระบุรหัสลูกค้าในช่อง 'สมาชิกร้าน' เมื่อมีการบันทึกยอดลูกหนี้!");
+        }
+
         if (!confirm("ยืนยันรับเงินและจบบิล?")) return;
+        
+        // 🛠️ [Lilin Surgical Fix] Update Customer Outstanding Debt in CRM
+        if (debt > 0 && customerId !== "" && typeof database !== "undefined") {
+          database.ref("erp_db_customer/" + customerId).once("value").then(function(snapshot) {
+            let cus = snapshot.val() || {};
+            let currentDebt = parseFloat(cus.outstandingDebt) || 0;
+            database.ref("erp_db_customer/" + customerId).update({
+              outstandingDebt: currentDebt + debt
+            }).catch(e => console.error("CRM Debt Sync Error: ", e));
+          });
+        }
 
         // 1. Generate Bill Number and Data
         let autoBillNumber = currentIpaqTable.ipaqBillNumber;
@@ -13238,6 +13888,7 @@ function _fallbackPromptEdit(orderItem) {
             cashInput: cash.toString(),
             transferInput: transfer.toString(),
             transferBank: bankEl ? bankEl.value : "",
+            debtAmount: debt.toString(),
             changeDue: changeDue.toString(),
             details: billDetails,
             itemsJSON: itemsJSON,
@@ -13257,6 +13908,7 @@ function _fallbackPromptEdit(orderItem) {
           billDetails,
           itemsJSON,
           transfer.toString(),
+          debt.toString(),
         ];
         let localSales = JSON.parse(
           localStorage.getItem("thep_local_sales_history") || "[]",
@@ -13277,6 +13929,7 @@ function _fallbackPromptEdit(orderItem) {
           totalAmount: netTotal,
           cashAmount: cash,
           transferAmount: transfer,
+          debtAmount: debt,
           bankName: bankEl ? bankEl.value : "",
           customerCrm: crmEl ? crmEl.value : "",
           items: tOrders.map((o) => (Object.assign({}, o))),
@@ -13459,9 +14112,33 @@ function _fallbackPromptEdit(orderItem) {
               }
 
               // --- 2. Rebuild Items for IPAQ ---
+              window.playedAlertIds = window.playedAlertIds || new Set();
+
               let itemsKeys = Object.keys(order.items || {});
               itemsKeys.forEach((k) => {
                 let item = order.items[k];
+
+                // [Lilin Feature] 1.1.2 Call Waiter / Request Song Alert
+                let note = item.note || "";
+                if ((note.includes("เรียกพนักงาน") || note.includes("ขอเพลง")) && !window.playedAlertIds.has(k)) {
+                    window.playedAlertIds.add(k);
+                    let audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+                    audio.play().catch(e => console.log("Audio play blocked by browser:", e));
+                    
+                    let titleStr = note.includes("เรียกพนักงาน") ? "🔔 เรียกพนักงาน!" : "🎵 ขอเพลง!";
+                    if (typeof Swal !== "undefined") {
+                        Swal.fire({
+                            title: titleStr,
+                            text: 'โต๊ะ: ' + (tObj ? tObj.name : tableKey),
+                            icon: 'info',
+                            timer: 5000,
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false
+                        });
+                    }
+                }
+
                 if (typeof tableOrders !== "undefined") {
                   let ipaqOrder = {
                     id: "O_SYNC_" + tableKey + "_" + k,
@@ -14850,12 +15527,20 @@ function ipaqPromptSplitTable() {
             var container = document.getElementById('debtor-list-container');
             container.innerHTML = '';
             
-            if (!window.dbCustomer || window.dbCustomer.length === 0) {
+            var cusData = (window.erpData && window.erpData["customer"]) ? window.erpData["customer"] : {};
+            var customers = [];
+            for (let k in cusData) {
+                let c = Object.assign({}, cusData[k]);
+                c.id = c.id || k;
+                customers.push(c);
+            }
+            
+            if (customers.length === 0) {
                 container.innerHTML = '<div style="text-align:center; color:#999; padding:10px;">ไม่มีข้อมูลลูกค้าในระบบ</div>';
                 return;
             }
             
-            var filtered = window.dbCustomer.filter(function(c) {
+            var filtered = customers.filter(function(c) {
                 return (c.id && c.id.toLowerCase().includes(query)) || (c.name && c.name.toLowerCase().includes(query));
             });
             
@@ -14890,10 +15575,229 @@ function ipaqPromptSplitTable() {
                 if (typeof calcIpaqChange === 'function') calcIpaqChange();
             }
             closeDebtorModal();
-            // Step 1 alert to confirm the UI works
-            alert(`เลือกลูกหนี้สำเร็จ: ${customer.name || customer.id}\n\n(ตอนนี้เป็นเพียงการทดสอบ UI ขั้นตอนที่ 1 รบกวนบอสตรวจสอบความสวยงามก่อนครับ เมื่อบอสโอเค ลิลินจะเริ่มเขียนขั้นตอนที่ 2 เพื่อผูกระบบตัดวงเงินและบัญชีต่อไปค่ะ)`);
         }
     </script>
+    <!-- Debt Payment Modal (Phase 2) -->
+    <div id="debt-pay-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+            <h3 style="margin-top:0; color:#2ecc71;">💵 รับชำระหนี้</h3>
+            <p><strong>รหัสลูกค้า:</strong> <span id="debt-pay-id"></span></p>
+            <p><strong>ชื่อลูกค้า:</strong> <span id="debt-pay-name"></span></p>
+            <p><strong>ยอดค้างชำระ:</strong> <span id="debt-pay-outstanding" style="color:red; font-weight:bold;"></span> บาท</p>
+            
+            <label style="font-weight:bold; display:block; margin-top:10px;">ระบุยอดเงินที่ชำระ (บาท):</label>
+            <input type="number" id="debt-pay-amount" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; outline:none; font-size:16px; font-weight:bold;" />
+            
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button onclick="closePayDebtModal()" style="padding:10px 20px; background:#e74c3c; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">ยกเลิก</button>
+                <button onclick="submitDebtPayment()" style="padding:10px 20px; background:#2ecc71; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">บันทึกรับชำระ</button>
+            </div>
+        </div>
+    </div>
+    <script>
+      function openPayDebtModal(id, name, debt) {
+         document.getElementById('debt-pay-id').innerText = id;
+         document.getElementById('debt-pay-name').innerText = name;
+         document.getElementById('debt-pay-outstanding').innerText = parseFloat(debt).toLocaleString('en-US', {minimumFractionDigits:2});
+         document.getElementById('debt-pay-amount').value = debt; // Default to full amount
+         document.getElementById('debt-pay-modal').style.display = 'flex';
+      }
+      function closePayDebtModal() {
+         document.getElementById('debt-pay-modal').style.display = 'none';
+      }
+      function submitDebtPayment() {
+         let id = document.getElementById('debt-pay-id').innerText;
+         let name = document.getElementById('debt-pay-name').innerText;
+         let payAmount = parseFloat(document.getElementById('debt-pay-amount').value) || 0;
+         let maxDebt = parseFloat(document.getElementById('debt-pay-outstanding').innerText.replace(/,/g, '')) || 0;
+         
+         if (payAmount <= 0) {
+            alert('กรุณาระบุจำนวนเงินที่ถูกต้อง');
+            return;
+         }
+         if (payAmount > maxDebt) {
+            if(!confirm('ยอดชำระมากกว่าหนี้คงค้าง ต้องการบันทึกหรือไม่?')) return;
+         }
+         
+         if (!confirm(`ยืนยันการรับชำระหนี้จากคุณ ${name} จำนวน ${payAmount.toLocaleString('en-US', {minimumFractionDigits:2})} บาท?`)) return;
+         
+         let now = new Date();
+         let ts = getLocalISOString(now); // using the local function
+         let payId = "DP-" + Date.now();
+         
+         let paymentRecord = {
+            payId: payId,
+            customerId: id,
+            customerName: name,
+            amount: payAmount,
+            timestamp: ts,
+            method: "Cash"
+         };
+         
+         database.ref("erp_db_debt_payments/" + payId).set(paymentRecord).then(() => {
+            return database.ref("erp_db_customer/" + id).once("value");
+         }).then(snapshot => {
+            let cus = snapshot.val() || {};
+            let currentDebt = parseFloat(cus.outstandingDebt) || 0;
+            let newDebt = Math.max(0, currentDebt - payAmount);
+            return database.ref("erp_db_customer/" + id).update({ outstandingDebt: newDebt });
+         }).then(() => {
+            alert(`บันทึกรับชำระหนี้ ${payAmount.toLocaleString()} บาท เรียบร้อยแล้ว`);
+            closePayDebtModal();
+         }).catch(err => {
+            console.error("Error saving debt payment:", err);
+            alert("เกิดข้อผิดพลาดในการบันทึกรับชำระหนี้");
+         });
+      }
+      // ====================================================
+      // [Lilin Phase 3] Creditor Management Logic
+      // ====================================================
+      function renderCreditorTable() {
+          if (typeof database === 'undefined') return;
+          
+          let searchQuery = (document.getElementById('creditor-search-input').value || "").toLowerCase();
+          
+          database.ref("erp_db_creditors").once("value").then(snap => {
+             let data = snap.val() || {};
+             let tbody = document.getElementById('creditor-table-body');
+             let totalOutstanding = 0;
+             let html = "";
+             
+             let creditors = Object.values(data);
+             creditors.forEach(c => {
+                 let debt = parseFloat(c.outstandingDebt) || 0;
+                 totalOutstanding += debt;
+                 
+                 if (searchQuery && (!c.supplierName || !c.supplierName.toLowerCase().includes(searchQuery))) return;
+                 if (debt <= 0) return; // ซ่อนคนที่ไม่มีหนี้
+                 
+                 html += "<tr>";
+                 html += "<td style='padding: 10px; border-bottom: 1px solid #eee;'>" + (c.supplierName || 'ไม่ระบุ') + "</td>";
+                 html += "<td style='padding: 10px; text-align: right; border-bottom: 1px solid #eee; color: #e74c3c; font-weight: bold;'>" + debt.toLocaleString(undefined, {minimumFractionDigits: 2}) + "</td>";
+                 html += "<td style='padding: 10px; text-align: center; border-bottom: 1px solid #eee;'>";
+                 html += "<button onclick='openPayCreditorModal(\"" + c.supplierName + "\", " + debt + ")' style='background: #2ecc71; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-family: \"Prompt\";'>💸 จ่ายชำระ</button>";
+                 html += "</td>";
+                 html += "</tr>";
+             });
+             
+             if (html === "") html = "<tr><td colspan='3' style='text-align: center; padding: 20px; color: #7f8c8d;'>ไม่มีข้อมูลหนี้คงค้าง</td></tr>";
+             
+             tbody.innerHTML = html;
+             document.getElementById('creditor-total-outstanding').innerText = totalOutstanding.toLocaleString(undefined, {minimumFractionDigits: 2}) + " บาท";
+          }).catch(err => {
+              document.getElementById('creditor-table-body').innerHTML = "<tr><td colspan='3' style='text-align: center; color: red;'>โหลดข้อมูลผิดพลาด: " + err.message + "</td></tr>";
+          });
+      }
+
+      let currentPayingSupplier = "";
+      function openPayCreditorModal(supplierName, outstanding) {
+          currentPayingSupplier = supplierName;
+          document.getElementById('pay-creditor-name').innerText = supplierName;
+          document.getElementById('pay-creditor-outstanding').innerText = outstanding.toLocaleString(undefined, {minimumFractionDigits: 2});
+          document.getElementById('pay-creditor-amount').value = outstanding;
+          document.getElementById('pay-creditor-modal').style.display = 'block';
+      }
+
+      function submitCreditorPayment() {
+          let amount = parseFloat(document.getElementById('pay-creditor-amount').value);
+          if (!amount || amount <= 0) {
+              alert("⚠️ กรุณาระบุจำนวนเงินที่ถูกต้อง");
+              return;
+          }
+          
+          let method = document.getElementById('pay-creditor-method').value;
+          
+          database.ref("erp_db_creditors/" + currentPayingSupplier).once("value").then(snap => {
+              let currentDebt = snap.val() ? (parseFloat(snap.val().outstandingDebt) || 0) : 0;
+              let newDebt = currentDebt - amount;
+              if (newDebt < 0) newDebt = 0;
+              
+              database.ref("erp_db_creditors/" + currentPayingSupplier + "/outstandingDebt").set(newDebt);
+              
+              let ts = Date.now();
+              database.ref("erp_db_creditor_payments/PAY_" + ts).set({
+                   type: "pay",
+                   supplierName: currentPayingSupplier,
+                   amount: amount,
+                   method: method,
+                   date: getLocalISOString(new Date()),
+                   note: "ชำระหนี้เจ้าหนี้การค้า"
+              }).then(() => {
+                  alert("✅ บันทึกการจ่ายชำระหนี้เรียบร้อยแล้ว (" + amount.toLocaleString() + " บาท)");
+                  document.getElementById('pay-creditor-modal').style.display = 'none';
+                  renderCreditorTable(); 
+                  
+                  if (document.getElementById('report-start-date')) {
+                      generateReport('master_financial');
+                  }
+              });
+          });
+      }
+    </script>
+
+    <!-- [Lilin Surgical Additive Phase 3] Creditor Management Modal -->
+    <div id="creditor-modal" class="modal-overlay" style="z-index: 10006;">
+      <div class="modal-content" style="width: 95%; max-width: 700px; padding: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e74c3c; padding-bottom: 10px; margin-bottom: 15px;">
+          <div class="modal-title" style="color: #e74c3c; font-size: 22px; font-weight: bold;">
+            🚚 ระบบจัดการเจ้าหนี้ (Creditors)
+          </div>
+          <button type="button" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #7f8c8d;" onclick="document.getElementById('creditor-modal').style.display='none'">✖</button>
+        </div>
+        
+        <div style="background: #fdfefe; border: 1px solid #ecf0f1; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+           <div>
+             <div style="font-size: 14px; color: #7f8c8d;">ยอดหนี้ค้างชำระรวมทั้งหมด</div>
+             <div style="font-size: 24px; font-weight: bold; color: #e74c3c;" id="creditor-total-outstanding">0.00 บาท</div>
+           </div>
+           <div>
+             <input type="text" id="creditor-search-input" placeholder="🔍 ค้นหาชื่อเจ้าหนี้..." oninput="renderCreditorTable()" style="padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 200px; font-family: 'Prompt', sans-serif;">
+           </div>
+        </div>
+
+        <div style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px;">
+          <table class="db-table" style="width: 100%; border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background: #fdfefe; box-shadow: 0 1px 3px rgba(0,0,0,0.1); z-index: 1;">
+              <tr>
+                <th style="padding: 10px; text-align: left;">รายชื่อผู้จำหน่าย / ร้านค้า (Supplier)</th>
+                <th style="padding: 10px; text-align: right;">ยอดหนี้คงค้าง (บาท)</th>
+                <th style="padding: 10px; text-align: center;">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="creditor-table-body">
+              <tr><td colspan="3" style="text-align: center; padding: 20px;">กำลังโหลดข้อมูล...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- [Lilin Surgical Additive Phase 3] Pay Creditor Modal -->
+    <div id="pay-creditor-modal" class="modal-overlay" style="z-index: 10007;">
+      <div class="modal-content" style="width: 95%; max-width: 400px; text-align: center;">
+        <h3 style="color: #e74c3c; margin-top: 0;">💸 จ่ายชำระหนี้ (เจ้าหนี้)</h3>
+        <p style="font-size: 14px; color: #7f8c8d;">กำลังจ่ายเงินให้ร้าน: <strong id="pay-creditor-name" style="color: var(--text-main);"></strong></p>
+        <p style="font-size: 14px;">ยอดหนี้คงค้าง: <strong id="pay-creditor-outstanding" style="color: #e74c3c;"></strong> บาท</p>
+        
+        <div style="margin: 20px 0; text-align: left;">
+          <label style="display: block; font-weight: bold; margin-bottom: 5px;">จำนวนเงินที่จ่าย (บาท):</label>
+          <input type="number" id="pay-creditor-amount" placeholder="0.00" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; font-family: 'Prompt', sans-serif;">
+        </div>
+        
+        <div style="margin: 20px 0; text-align: left;">
+          <label style="display: block; font-weight: bold; margin-bottom: 5px;">ช่องทางการชำระ (เงินสดจะหักจากลิ้นชัก):</label>
+          <select id="pay-creditor-method" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: 'Prompt', sans-serif;">
+            <option value="cash">💵 เงินสด (หักลิ้นชัก)</option>
+            <option value="transfer">📱 โอนเงินบัญชีร้าน</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" onclick="submitCreditorPayment()" style="flex: 1; padding: 10px; background: #2ecc71; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">✅ ยืนยันชำระ</button>
+          <button type="button" onclick="document.getElementById('pay-creditor-modal').style.display='none'" style="flex: 1; padding: 10px; background: #95a5a6; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">ยกเลิก</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
 
