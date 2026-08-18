@@ -639,12 +639,19 @@
         }
 
         function renderProducts() {
-            var searchTxt = document.getElementById("menu-search").value.toLowerCase();
+            var searchTxt = document.getElementById("menu-search").value.toLowerCase().trim();
             var html = "";
             for (var i = 0; i < allProducts.length; i++) {
                 var p = allProducts[i];
-                if (currentCategory !== "ทั้งหมด" && p.category !== currentCategory) continue;
-                if (searchTxt && p.name.toLowerCase().indexOf(searchTxt) === -1) continue;
+                
+                // ถ้ามีการพิมพ์ค้นหา ให้ข้ามเงื่อนไขหมวดหมู่ไปเลย (ค้นหาทั้งหมด)
+                if (searchTxt) {
+                    var pName = (p.name || '').toLowerCase();
+                    if (pName.indexOf(searchTxt) === -1) continue;
+                } else {
+                    // ถ้าไม่ได้ค้นหา ให้กรองตามหมวดหมู่ปกติ
+                    if (currentCategory !== "ทั้งหมด" && p.category !== currentCategory) continue;
+                }
 
                 var bgImg = (p.image && p.image.indexOf('http') === 0) ? p.image : './ภาพเมนู.jpg';
                 var itemCode = p.barcode || p.id;
