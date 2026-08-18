@@ -9448,9 +9448,9 @@
           + '<span>' + grandTotal.toFixed(2) + '</span>'
           + '</div>'
           + '<div style="text-align:center;font-size:12px;margin-bottom:20px;">ขอบคุณที่ใช้บริการค่ะ</div>'
-          + '<br><br><br><br><br><br><br><br></div>';
+          + '</div>';
 
-        let cashFullHtml = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Cash</title><style>@page{margin:0;size:80mm 2000mm;}body{font-family:Kanit,Sarabun,Arial,sans-serif;width:72mm;margin:0 auto;padding:3mm;color:#000;}</style></head><body>' + cashBodyHtml + '</body></html>';
+        let cashFullHtml = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Cash</title><style>@page{margin:0;size:auto;}body{font-family:Kanit,Sarabun,Arial,sans-serif;width:72mm;margin:0 auto;padding:3mm;color:#000;}</style></head><body>' + cashBodyHtml + '</body></html>';
 
         // === ครั้งที่ 2: HTML บิลครัว (เฉพาะอาหาร) ===
         let foodItems = newItems.filter((item) => { let cat = item.category || ""; return cat !== "ประเภทเครื่องดื่ม"; });
