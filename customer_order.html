@@ -251,7 +251,7 @@
         };
 
         function loadProducts() {
-            database.ref('erp_db_product').once('value', (snapshot) => {
+            database.ref('erp_db_products_global').once('value', (snapshot) => {
                 let db = snapshot.val() || {};
                 allProducts = [];
                 let cats = new Set();
