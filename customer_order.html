@@ -316,7 +316,7 @@
                         <div class="product-price">${fmt(p.price)}</div>
                     </div>
                     <div>
-                        <button class="btn-add" onclick="addToCart('${p.sku}', '${p.name}', ${p.price}, '${p.category}')">
+                        <button class="btn-add" onclick="addToCart('${p.barcode || p.id}', '${p.name}', ${p.price}, '${p.category}')">
                             <i class="fas fa-plus"></i> เพิ่ม
                         </button>
                     </div>

@@ -732,6 +732,17 @@
             renderCart();
         }
 
+        function changeNewCartItemQty(index, delta) {
+            if (newCartItems[index]) {
+                newCartItems[index].qty += delta;
+                if (newCartItems[index].qty <= 0) {
+                    removeNewCartItem(index);
+                } else {
+                    renderCart();
+                }
+            }
+        }
+
         function renderCart() {
             var html = "";
             var grandTotal = 0;
@@ -776,10 +787,16 @@
                     grandTotal += (Number(newItem.price) * Number(newItem.qty));
                     uniqueItemNames[newItem.name] = true;
                     
-                    html += '<div class="cart-item new-item">';
+                    html += '<div class="cart-item new-item" style="flex-direction:column; align-items:stretch;">';
+                    html += '<div style="display:flex; justify-content:space-between; align-items:center;">';
                     html += '<div class="cart-item-name">' + newItem.name + '<br><small style="color:gray;font-weight:normal;cursor:pointer;" onclick="addNote(' + j + ')">📝 ' + (newItem.note || 'เพิ่มหมายเหตุ') + '</small></div>';
-                    html += '<div class="cart-item-qty">x' + newItem.qty + '</div>';
-                    html += '<div class="cart-item-price">฿' + (Number(newItem.price) * Number(newItem.qty)).toLocaleString() + '</div>';
+                    html += '<div style="display:flex; align-items:center; gap:8px;">';
+                    html += '<button onclick="changeNewCartItemQty(' + j + ', -1)" style="border:none;background:#e53e3e;color:white;width:28px;height:28px;border-radius:50%;font-weight:bold;cursor:pointer;display:flex;justify-content:center;align-items:center;">-</button>';
+                    html += '<div class="cart-item-qty" style="margin:0; background:none; font-size:18px;">' + newItem.qty + '</div>';
+                    html += '<button onclick="changeNewCartItemQty(' + j + ', 1)" style="border:none;background:#38a169;color:white;width:28px;height:28px;border-radius:50%;font-weight:bold;cursor:pointer;display:flex;justify-content:center;align-items:center;">+</button>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<div class="cart-item-price" style="text-align:right; margin-top:8px;">฿' + (Number(newItem.price) * Number(newItem.qty)).toLocaleString() + '</div>';
                     html += '</div>';
                 }
             }
