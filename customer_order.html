@@ -291,12 +291,15 @@
             container.innerHTML = "";
             
             const searchInput = document.getElementById('customer-menu-search');
-            const searchQuery = searchInput ? searchInput.value.toLowerCase() : "";
+            const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
-            let filtered = currentCategory === "ทั้งหมด" ? allProducts : allProducts.filter(p => p.category === currentCategory);
-            
+            let filtered;
             if (searchQuery) {
-                filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchQuery));
+                // ถ้ามีการค้นหา ให้หาจากเมนูทั้งหมด (ไม่สนหมวดหมู่) และใช้ .trim() ตัดช่องว่างแล้ว
+                filtered = allProducts.filter(p => (p.name || '').toLowerCase().includes(searchQuery));
+            } else {
+                // ถ้าไม่ได้ค้นหา ให้กรองตามหมวดหมู่ปกติ
+                filtered = currentCategory === "ทั้งหมด" ? allProducts : allProducts.filter(p => p.category === currentCategory);
             }
             
             if (filtered.length === 0) {
