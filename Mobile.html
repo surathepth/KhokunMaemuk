@@ -233,18 +233,11 @@
             <span>เลือกโต๊ะ (IPAQ)</span>
             <button class="btn btn-red" style="padding: 5px 10px; font-size: 12px;" onclick="doLogout()">ออก</button>
         </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="btn btn-green" style="width: 80%; max-width: 300px; padding: 15px; font-size: 18px;" onclick="startScanQR()">📷 สแกน QR โต๊ะ</button>
-        </div>
-        <div id="camera-container">
-            <div id="reader" style="width:100%; margin-top: 10px;"></div>
-            <button class="btn btn-red" style="width: 100%; margin-top: 5px;" onclick="stopScanQR()">❌ ยกเลิกสแกน</button>
-        </div>
-        <div style="padding: 20px; max-width: 400px; margin: 0 auto; margin-top: 20px;">
-            <select id="table-select" style="width:100%; padding:15px; font-size:18px; border-radius:15px; border:2px solid #ccc; background:#fff; margin-bottom:15px; font-family:'Prompt',sans-serif; color:#2d3748; font-weight:bold;">
-                <option value="">-- กรุณาเลือกโต๊ะ --</option>
-            </select>
-            <button class="btn btn-blue" style="width: 100%; padding: 18px; font-size: 20px; border-radius: 15px;" onclick="openSelectedTable()">✅ เปิดโต๊ะรับออเดอร์</button>
+        <div style="padding: 20px; max-width: 600px; margin: 0 auto; margin-top: 10px;">
+            <div id="table-grid-container" class="table-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                <!-- Tables will be dynamically generated here -->
+            </div>
+            
             <div style="margin-top: 40px; text-align: center;">
                 <img src="./โลโก้.png" alt="ล้านโคขุนริมโขง" style="max-width: 100%; height: auto; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.15);">
             </div>
@@ -444,77 +437,34 @@
         }
 
         function renderTableGrid() {
-            var html = '<option value="">-- กรุณาเลือกโต๊ะ --</option>';
+            var html = '';
             for (var i = 0; i < allTables.length; i++) {
                 var t = allTables[i];
-                html += '<option value="' + t.id + '">' + t.name + '</option>';
+                html += '<button class="table-btn" id="btn-table-' + t.id + '" onclick="openTable(\'' + t.id + '\', \'' + t.name + '\')">' + t.name + '</button>';
             }
-            var selectEl = document.getElementById("table-select");
-            if (selectEl) selectEl.innerHTML = html;
-        }
-
-        function openSelectedTable() {
-            var select = document.getElementById("table-select");
-            if (!select) return;
-            var val = select.value;
-            if (!val) { alert("กรุณาเลือกโต๊ะก่อน!"); return; }
-            var tName = val;
-            for (var i = 0; i < allTables.length; i++) {
-                if (allTables[i].id === val) { tName = allTables[i].name; break; }
-            }
-            openTable(val, tName);
+            var gridEl = document.getElementById("table-grid-container");
+            if (gridEl) gridEl.innerHTML = html;
         }
 
         function updateTableColors(occupiedMap) {
-            var select = document.getElementById("table-select");
-            if (!select) return;
-            for (var i = 0; i < select.options.length; i++) {
-                var opt = select.options[i];
-                var tId = opt.value;
-                if (!tId) continue;
-                if (occupiedMap[tId]) {
-                    if (opt.text.indexOf("🔴") === -1) opt.text = "🔴 " + opt.text + " (มีคนนั่ง)";
-                } else {
-                    opt.text = opt.text.replace("🔴 ", "").replace(" (มีคนนั่ง)", "");
-                }
-            }
-        }
-
-        // ================= LOGIC QR SCANNER =================
-        function startScanQR() {
-            document.getElementById("camera-container").style.display = "block";
-            if (!html5QrcodeScanner) {
-                html5QrcodeScanner = new Html5Qrcode("reader");
-            }
-            html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, function(decodedText) {
-                // สมมติว่า QR code เก็บ ID โต๊ะ เช่น "T01" หรือ URL "?table=T01"
-                var scannedTableId = decodedText;
-                if (decodedText.indexOf("table=") !== -1) {
-                    var parts = decodedText.split("table=");
-                    scannedTableId = parts[1].split("&")[0];
-                }
-                stopScanQR();
+            for (var i = 0; i < allTables.length; i++) {
+                var tId = allTables[i].id;
+                var btn = document.getElementById("btn-table-" + tId);
+                if (!btn) continue;
                 
-                // หาชื่อโต๊ะ
-                var tName = scannedTableId;
-                for (var i = 0; i < allTables.length; i++) {
-                    if (allTables[i].id === scannedTableId) {
-                        tName = allTables[i].name;
-                        break;
-                    }
+                if (occupiedMap[tId]) {
+                    btn.classList.add("occupied");
+                    // Add pulse effect for occupied tables
+                    btn.style.animation = "pulse 2s infinite";
+                } else {
+                    btn.classList.remove("occupied");
+                    btn.style.animation = "none";
                 }
-                openTable(scannedTableId, tName);
-            }).catch(function(err) {
-                console.log(err);
-            });
-        }
-
-        function stopScanQR() {
-            document.getElementById("camera-container").style.display = "none";
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.stop().catch(function(err){});
             }
         }
+
+
+
 
         // ================= LOGIC ORDER =================
         function openTable(tId, tName) {
