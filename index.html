@@ -10772,11 +10772,17 @@
                   logs.sort((a,b) => b.timestamp - a.timestamp); // newest first
                   
                   list.innerHTML = logs.map(l => {
-                      let timeStr = new Date(l.timestamp).toLocaleTimeString('th-TH');
+                      let timeStr = l.timestamp ? new Date(l.timestamp).toLocaleTimeString('th-TH') : (l.time || "-");
                       let actionColor = l.action === "DELETE" ? "red" : (l.action === "EDIT" ? "blue" : "orange");
+                      let staff = l.staffName || l.staff || "ไม่ระบุชื่อ";
+                      if (staff === "undefined" || !staff.trim()) staff = "ไม่ระบุชื่อ";
+                      let staffIdStr = (l.staffId && l.staffId !== "undefined") ? ` (${l.staffId})` : "";
+                      let detailText = l.details || l.detail || "ไม่ระบุรายละเอียด";
+                      if (detailText === "undefined" || !detailText.trim()) detailText = "ไม่ระบุรายละเอียด";
+
                       return `<div style="background:white; border-left:4px solid ${actionColor}; padding:10px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); border-radius:4px;">
-                          <div style="font-size:12px; color:#7f8c8d;">⏰ ${timeStr} | 👤 ${l.staffName} (${l.staffId})</div>
-                          <div style="font-size:14px; font-weight:bold; margin-top:5px; color:#2c3e50;">${l.details}</div>
+                          <div style="font-size:12px; color:#7f8c8d;">⏰ ${timeStr} | 👤 ${staff}${staffIdStr}</div>
+                          <div style="font-size:14px; font-weight:bold; margin-top:5px; color:#2c3e50;">${detailText}</div>
                       </div>`;
                   }).join("");
               } else {

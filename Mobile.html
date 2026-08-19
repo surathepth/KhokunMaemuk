@@ -604,10 +604,16 @@
                     if (currentCategory !== "ทั้งหมด" && p.category !== currentCategory) continue;
                 }
 
+                var catStr = p.category || '';
+                var pNameStr = p.name || '';
+                var isDrink = catStr.indexOf('เครื่องดื่ม') !== -1 || catStr.indexOf('Bar') !== -1 || catStr.indexOf('น้ำ') !== -1 ||
+                              pNameStr.indexOf('น้ำ') !== -1 || pNameStr.indexOf('เบียร์') !== -1 || pNameStr.indexOf('โซดา') !== -1 ||
+                              pNameStr.indexOf('โค้ก') !== -1 || pNameStr.indexOf('เป๊ปซี่') !== -1;
+
                 var bgImg = './ภาพเมนู.jpg';
                 if (p.image && p.image.indexOf('http') === 0) {
                     bgImg = p.image;
-                } else if (p.category === 'เครื่องดื่ม') {
+                } else if (isDrink) {
                     bgImg = './images/bg_drink.png';
                 }
                 var itemCode = p.barcode || p.id;
@@ -745,7 +751,7 @@
                     
                     html += '<div class="cart-item new-item" style="flex-direction:column; align-items:stretch;">';
                     html += '<div style="display:flex; justify-content:space-between; align-items:center;">';
-                    html += '<div class="cart-item-name">' + newItem.name + '<br><small style="color:gray;font-weight:normal;cursor:pointer;" onclick="addNote(' + j + ')">📝 ' + (newItem.note || 'เพิ่มหมายเหตุ') + '</small></div>';
+                    html += '<div class="cart-item-name">' + newItem.name + '<br><small style="color:gray;font-weight:normal;cursor:pointer;" onclick="openEditModal(' + j + ')">📝 ' + (newItem.note || (newItem.id === '00001' ? 'แก้ไขรายการ/ราคา/หมายเหตุ' : 'เพิ่มหมายเหตุ')) + '</small></div>';
                     html += '<div style="display:flex; align-items:center; gap:8px;">';
                     html += '<button onclick="changeNewCartItemQty(' + j + ', -1)" style="border:none;background:#e53e3e;color:white;width:28px;height:28px;border-radius:50%;font-weight:bold;cursor:pointer;display:flex;justify-content:center;align-items:center;">-</button>';
                     html += '<div class="cart-item-qty" style="margin:0; background:none; font-size:18px;">' + newItem.qty + '</div>';
@@ -820,13 +826,47 @@
             }
         }
 
-        function addNote(index) {
-            var currentNote = newCartItems[index].note || "";
-            var note = prompt("ใส่หมายเหตุ:", currentNote);
-            if (note !== null) {
-                newCartItems[index].note = note;
-                renderCart();
+        function openEditModal(index) {
+            var item = newCartItems[index];
+            if (!item) return;
+            
+            // ตรวจสอบว่าเป็นรายการนอกเมนู (00001) หรือไม่มีในฐานข้อมูลสินค้าหรือไม่
+            var isCustom = (item.id === "00001" || item.category === "นอกเมนู");
+            if (!isCustom) {
+                var found = false;
+                for (var i = 0; i < allProducts.length; i++) {
+                    if (allProducts[i].barcode === item.id || allProducts[i].id === item.id) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) isCustom = true;
             }
+
+            if (isCustom) {
+                var newName = prompt("แก้ไขชื่อรายการ (นอกเมนู):", item.name);
+                if (newName !== null && newName.trim() !== "") {
+                    item.name = newName.trim();
+                }
+                var newPrice = prompt("แก้ไขราคา (บาท):", item.price);
+                if (newPrice !== null && !isNaN(Number(newPrice))) {
+                    item.price = Number(newPrice);
+                }
+                var newNote = prompt("แก้ไขหมายเหตุ:", item.note || "");
+                if (newNote !== null) {
+                    item.note = newNote;
+                }
+            } else {
+                var note = prompt("ใส่หมายเหตุ:", item.note || "");
+                if (note !== null) {
+                    item.note = note;
+                }
+            }
+            renderCart();
+        }
+
+        function addNote(index) {
+            openEditModal(index);
         }
 
         // ================= SEND ORDER =================
