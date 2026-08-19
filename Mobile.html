@@ -634,32 +634,56 @@
         function addToCart(barcode) {
             // ค้นหาสินค้า
             var product = null;
-            for (var i = 0; i < allProducts.length; i++) {
-                if (allProducts[i].barcode === barcode || allProducts[i].id === barcode) {
-                    product = allProducts[i];
-                    break;
+            if (barcode === "00001") {
+                product = { id: "00001", barcode: "00001", name: "สินค้านอกเมนู", price: 0, category: "นอกเมนู" };
+            } else {
+                for (var i = 0; i < allProducts.length; i++) {
+                    if (allProducts[i].barcode === barcode || allProducts[i].id === barcode) {
+                        product = allProducts[i];
+                        break;
+                    }
                 }
             }
             if (!product) return;
             
-            // กรณี Custom Menu (นอกเมนู) ให้เด้งถามชื่อและราคา
+            // กรณี Custom Menu (นอกเมนู) ให้เด้งถามชื่อและราคาผ่าน Swal
             if (product.barcode === "00001" || product.name.indexOf("นอกเมนู") !== -1) {
-                var cName = prompt("ใส่ชื่อรายการ (นอกเมนู):", "");
-                if (!cName) return;
-                var cPrice = prompt("ใส่ราคา (บาท):", "0");
-                if (!cPrice) return;
-                var cNote = prompt("หมายเหตุเพิ่มเติม (ถ้ามี):", "");
-                
-                newCartItems.push({
-                    id: "00001",
-                    name: cName,
-                    price: Number(cPrice),
-                    qty: 1,
-                    note: cNote || "",
-                    isNewItem: true,
-                    category: "นอกเมนู"
+                Swal.fire({
+                    title: 'สั่งสินค้านอกเมนู',
+                    html:
+                        '<input id="swal-add-name" class="swal2-input" placeholder="ชื่อเมนู">' +
+                        '<input id="swal-add-price" class="swal2-input" type="number" placeholder="ราคา (บาท)">' +
+                        '<input id="swal-add-note" class="swal2-input" placeholder="หมายเหตุ (ถ้ามี)">',
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'เพิ่มลงตะกร้า',
+                    cancelButtonText: 'ยกเลิก',
+                    preConfirm: function() {
+                        return {
+                            name: document.getElementById('swal-add-name').value,
+                            price: document.getElementById('swal-add-price').value,
+                            note: document.getElementById('swal-add-note').value
+                        }
+                    }
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        var cName = result.value.name;
+                        var cPrice = result.value.price;
+                        var cNote = result.value.note;
+                        if (!cName) return;
+                        
+                        newCartItems.push({
+                            id: "00001",
+                            name: cName,
+                            price: Number(cPrice) || 0,
+                            qty: 1,
+                            note: cNote || "",
+                            isNewItem: true,
+                            category: "นอกเมนู"
+                        });
+                        renderCart();
+                    }
                 });
-                renderCart();
                 return;
             }
 
@@ -844,25 +868,47 @@
             }
 
             if (isCustom) {
-                var newName = prompt("แก้ไขชื่อรายการ (นอกเมนู):", item.name);
-                if (newName !== null && newName.trim() !== "") {
-                    item.name = newName.trim();
-                }
-                var newPrice = prompt("แก้ไขราคา (บาท):", item.price);
-                if (newPrice !== null && !isNaN(Number(newPrice))) {
-                    item.price = Number(newPrice);
-                }
-                var newNote = prompt("แก้ไขหมายเหตุ:", item.note || "");
-                if (newNote !== null) {
-                    item.note = newNote;
-                }
+                Swal.fire({
+                    title: 'แก้ไขรายการนอกเมนู',
+                    html:
+                        '<input id="swal-edit-name" class="swal2-input" placeholder="ชื่อเมนู" value="' + item.name + '">' +
+                        '<input id="swal-edit-price" class="swal2-input" type="number" placeholder="ราคา" value="' + item.price + '">' +
+                        '<input id="swal-edit-note" class="swal2-input" placeholder="หมายเหตุ" value="' + (item.note || '') + '">',
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'บันทึก',
+                    cancelButtonText: 'ยกเลิก',
+                    preConfirm: function() {
+                        return {
+                            name: document.getElementById('swal-edit-name').value,
+                            price: document.getElementById('swal-edit-price').value,
+                            note: document.getElementById('swal-edit-note').value
+                        }
+                    }
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        var vals = result.value;
+                        if (vals.name.trim() !== "") item.name = vals.name.trim();
+                        if (!isNaN(Number(vals.price))) item.price = Number(vals.price);
+                        item.note = vals.note;
+                        renderCart();
+                    }
+                });
             } else {
-                var note = prompt("ใส่หมายเหตุ:", item.note || "");
-                if (note !== null) {
-                    item.note = note;
-                }
+                Swal.fire({
+                    title: 'ใส่หมายเหตุ',
+                    input: 'text',
+                    inputValue: item.note || "",
+                    showCancelButton: true,
+                    confirmButtonText: 'บันทึก',
+                    cancelButtonText: 'ยกเลิก'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        item.note = result.value;
+                        renderCart();
+                    }
+                });
             }
-            renderCart();
         }
 
         function addNote(index) {
