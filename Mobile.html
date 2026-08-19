@@ -597,11 +597,16 @@
                 
                 var catStr = p.category || '';
                 var pNameStr = p.name || '';
-                var isDrink = catStr.indexOf('เครื่องดื่ม') !== -1 || catStr.indexOf('Bar') !== -1 || catStr.indexOf('น้ำ') !== -1 ||
-                              pNameStr.indexOf('น้ำ') !== -1 || pNameStr.indexOf('เบียร์') !== -1 || pNameStr.indexOf('โซดา') !== -1 ||
-                              pNameStr.indexOf('โค้ก') !== -1 || pNameStr.indexOf('เป๊ปซี่') !== -1;
+                var itemIsDrinkCategory = catStr.indexOf('เครื่องดื่ม') !== -1 || catStr === 'น้ำ' || catStr.toLowerCase() === 'bar' || catStr.indexOf('เบียร์') !== -1;
+                var nameIsDrink = pNameStr.indexOf('เบียร์') !== -1 || pNameStr.indexOf('โซดา') !== -1 || 
+                                  pNameStr.indexOf('โค้ก') !== -1 || pNameStr.indexOf('เป๊ปซี่') !== -1 ||
+                                  pNameStr.indexOf('สไปรท์') !== -1 || pNameStr.indexOf('แฟนต้า') !== -1 ||
+                                  pNameStr === 'น้ำเปล่า' || pNameStr === 'น้ำแข็ง' || pNameStr.indexOf('น้ำอัดลม') !== -1 ||
+                                  pNameStr.indexOf('สิงห์') !== -1 || pNameStr.indexOf('ไฮเนเก้น') !== -1 || 
+                                  pNameStr.indexOf('ช้าง') !== -1 || pNameStr.indexOf('ลีโอ') !== -1 ||
+                                  pNameStr.indexOf('เหล้า') !== -1 || pNameStr.indexOf('ไวน์') !== -1;
+                var isDrink = itemIsDrinkCategory || nameIsDrink;
 
-                // ถ้ามีการพิมพ์ค้นหา ให้ข้ามเงื่อนไขหมวดหมู่ไปเลย (ค้นหาทั้งหมด)
                 // ถ้ามีการพิมพ์ค้นหา ให้ข้ามเงื่อนไขหมวดหมู่ไปเลย (ค้นหาทั้งหมด)
                 if (searchTxt) {
                     var pNameLower = pNameStr.toLowerCase();
@@ -609,7 +614,7 @@
                 } else {
                     // ถ้าไม่ได้ค้นหา ให้กรองตามหมวดหมู่ปกติ
                     if (currentCategory !== "ทั้งหมด") {
-                        var isCategoryDrink = currentCategory.indexOf("เครื่องดื่ม") !== -1 || currentCategory.indexOf("น้ำ") !== -1 || currentCategory.indexOf("Bar") !== -1;
+                        var isCategoryDrink = currentCategory.indexOf("เครื่องดื่ม") !== -1 || currentCategory === "น้ำ" || currentCategory.toLowerCase() === "bar";
                         if (isCategoryDrink) {
                             // ถ้าเลือกหมวดที่เกี่ยวกับเครื่องดื่ม ให้ดึงเมนูเครื่องดื่มทั้งหมดมาแสดง (isDrink bypass)
                             if (!isDrink && p.category !== currentCategory) continue;
