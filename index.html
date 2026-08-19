@@ -9354,8 +9354,11 @@
                 <div style="width: 35%; text-align: center;">${parseFloat(item.price).toFixed(2)}</div>
                 <div style="width: 40%; text-align: right;">${total.toFixed(2)}</div>
             </div>
-            <div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 15px;">
+            <div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 5px;">
                 ${dateTimeStr}
+            </div>
+            <div style="text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 15px;">
+                พนักงาน: ${billData.staffName || "ไม่ระบุ"}
             </div>
             <div style="border-bottom: 2px dashed #000; margin-top: 5px; margin-bottom: 15px;"></div>
         </div>
@@ -9421,7 +9424,8 @@
         
         let cashBodyHtml = '<div style="page-break-inside: avoid; width:100%;padding:0;margin:0;box-sizing:border-box;color:#000;line-height:1.2;">'
           + '<div style="text-align:center;font-size:20px;font-weight:900;margin-bottom:5px;">โต๊ะ: ' + orderData.queueNo + '</div>'
-          + '<div style="text-align:center;font-size:13px;font-weight:normal;margin-bottom:10px;">วันที่: ' + globalDateTime + '</div>'
+          + '<div style="text-align:center;font-size:13px;font-weight:normal;margin-bottom:5px;">วันที่: ' + globalDateTime + '</div>'
+          + '<div style="text-align:center;font-size:13px;font-weight:normal;margin-bottom:10px;">พนักงาน: ' + (orderData.staffName || "ไม่ระบุ") + '</div>'
           + '<div style="border-bottom:1px dashed #000;margin-top:5px;margin-bottom:10px;"></div>';
 
         let grandTotal = 0;
@@ -9474,7 +9478,8 @@
               + '<div style="width:25%;text-align:left;">' + item.qty + '</div>'
               + '<div style="width:35%;text-align:center;">' + parseFloat(item.price).toFixed(2) + '</div>'
               + '<div style="width:40%;text-align:right;">' + tot.toFixed(2) + '</div></div>'
-              + '<div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:15px;">' + dt + '</div>'
+              + '<div style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:5px;">' + dt + '</div>'
+              + '<div style="text-align:center;font-size:14px;font-weight:bold;margin-bottom:15px;">พนักงาน: ' + (orderData.staffName || "ไม่ระบุ") + '</div>'
               + '<div style="border-bottom:2px dashed #000;margin-top:5px;margin-bottom:15px;"></div></div>';
           });
           kitchenFullHtml = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Kitchen</title><style>@page{margin:0;size:auto;}body{font-family:Kanit,Sarabun,Arial,sans-serif;width:72mm;margin:0 auto;padding:3mm;color:#000;}</style></head><body>' + kitBody + '</body></html>';
@@ -11836,7 +11841,7 @@ function _fallbackPromptEdit(orderItem) {
           }
 
           if (confirm("ยืนยันลบรายการนี้?")) {
-            if (oItem.isIpaqPrinted) saveIpaqAuditLog("DELETE", "ลบออเดอร์: " + oItem.name + " (โต๊ะ: " + currentIpaqTable.name + ")");
+            if (oItem.isIpaqPrinted) saveIpaqAuditLog("DELETE", "ลบออเดอร์: " + (oItem.productName || oItem.name || 'ไม่ทราบชื่อเมนู') + " (โต๊ะ: " + currentIpaqTable.name + ")");
             tableOrders.splice(orderIndex, 1);
             renderIpaqBill();
 
