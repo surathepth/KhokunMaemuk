@@ -1553,17 +1553,24 @@
                       display: flex; 
                       overflow-x: auto; 
                       white-space: nowrap; 
-                      padding: 8px 10px; 
+                      padding: 5px 8px; 
                       background: #fff; 
                       border-bottom: 1px solid #ddd;
+                      flex-shrink: 0;
+                      min-height: 56px;
+                      align-items: center;
+                      scroll-behavior: smooth;
                     }
-                    .ipaq-category-scroll::-webkit-scrollbar { display: none; }
+                    .ipaq-category-scroll::-webkit-scrollbar { height: 10px; }
+                    .ipaq-category-scroll::-webkit-scrollbar-track { background: #e8e8e8; border-radius: 5px; }
+                    .ipaq-category-scroll::-webkit-scrollbar-thumb { background: #aaa; border-radius: 5px; }
+                    .ipaq-category-scroll::-webkit-scrollbar-thumb:hover { background: #888; }
                     .ipaq-category-btn { 
-                      padding: 6px 15px; 
+                      padding: 10px 20px; 
                       border-radius: 20px; 
                       background: #eee; 
-                      margin-right: 8px; 
-                      font-size: 14px; 
+                      margin-right: 10px; 
+                      font-size: 16px; 
                       color: #555; 
                       border: none; 
                       cursor: pointer; 
@@ -4266,7 +4273,7 @@
             </button>
           </div>
           <!-- Search Bar Added by Lilin -->
-          <div style="padding: 4px 10px; background: #fff; text-align: center; border-bottom: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; align-items: center;">
+          <div style="padding: 4px 10px; background: #fff; text-align: center; border-bottom: 1px solid #ddd; display: flex; gap: 10px; justify-content: center; align-items: center; flex-shrink: 0;">
              <input type="text" id="ipaq-menu-search" placeholder="🔍 ค้นหาชื่อเมนู อาหารและเครื่องดื่ม..." onkeyup="filterIpaqMenu()" style="flex: 1; padding: 6px; font-size: 14px; border-radius: 8px; border: 2px solid #3498db; outline: none;">
              <button onclick="finishAndPrintKitchen('all')" style="padding: 6px 15px; font-size: 14px; font-weight: bold; background: #e67e22; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">✅ พิมพ์อาหารเครื่องดื่ม</button>
           </div>
@@ -10561,6 +10568,7 @@
                 id: pId,
                 name: rawName,
                 price: parseFloat(p.price || p.salePrice || 0),
+                category: p.category || "ไม่ระบุ",
                 image:
                   p.image || "https://via.placeholder.com/150?text=No+Image",
               });
@@ -11579,6 +11587,15 @@ function _fallbackPromptEdit(orderItem) {
         const catContainer = document.getElementById("ipaq-category-container");
         if (catContainer) {
             catContainer.innerHTML = "";
+            
+            // Add Mouse Drag Scroll
+            let isDown = false;
+            let startX, scrollLeft;
+            catContainer.onmousedown = (e) => { isDown = true; startX = e.pageX - catContainer.offsetLeft; scrollLeft = catContainer.scrollLeft; };
+            catContainer.onmouseleave = () => { isDown = false; };
+            catContainer.onmouseup = () => { isDown = false; };
+            catContainer.onmousemove = (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - catContainer.offsetLeft; const walk = (x - startX) * 2; catContainer.scrollLeft = scrollLeft - walk; };
+            
             catArray.forEach(cat => {
                 const btn = document.createElement("button");
                 btn.className = `ipaq-category-btn ${cat === currentIpaqCategory ? 'active' : ''}`;
