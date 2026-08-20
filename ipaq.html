@@ -510,25 +510,30 @@
 
         // ================= LOGIC PRODUCTS =================
         function loadProducts() {
-            database.ref("erp_db_product").once("value").then(function(snapshot) {
+            // [Lilin Sync Update] ดึงหมวดหมู่จาก Master Database โดยตรง
+            database.ref("erp_db_categories").on("value", function(snap) {
+                var cats = snap.val();
+                if (cats && Array.isArray(cats)) {
+                    allCategories = ["ทั้งหมด"].concat(cats);
+                } else {
+                    allCategories = ["ทั้งหมด"];
+                }
+                renderCategories();
+            });
+
+            database.ref("erp_db_product").on("value", function(snapshot) {
                 allProducts = [];
-                var catMap = {};
                 if (snapshot.exists()) {
                     var data = snapshot.val();
                     for (var key in data) {
                         if (data.hasOwnProperty(key)) {
                             var p = data[key];
-                            if (!p.category) p.category = "อื่นๆ";
-                            catMap[p.category] = true;
-                            // Ensure the product object has an ID/barcode property
+                            if (!p.category) p.category = "ทั่วไป";
                             p.id = p.id || key;
                             allProducts.push(p);
                         }
                     }
                 }
-                allCategories = ["ทั้งหมด"];
-                for (var c in catMap) { allCategories.push(c); }
-                renderCategories();
                 renderProducts();
             });
         }

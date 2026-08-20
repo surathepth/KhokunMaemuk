@@ -11594,12 +11594,11 @@ function _fallbackPromptEdit(orderItem) {
         const searchInput = document.getElementById("ipaq-menu-search");
         if(searchInput) searchInput.value = "";
         
-        // 1. Build Categories
-        let cats = new Set();
-        products.forEach(p => {
-            if(p.category && p.category !== '-') cats.add(p.category);
-        });
-        let catArray = ["ทั้งหมด", ...Array.from(cats)];
+        // 1. Build Categories from Master Sync (localCategories)
+        let catArray = ["ทั้งหมด"];
+        if (typeof localCategories !== "undefined" && Array.isArray(localCategories)) {
+            catArray = ["ทั้งหมด", ...localCategories];
+        }
         
         const catContainer = document.getElementById("ipaq-category-container");
         if (catContainer) {
