@@ -5151,8 +5151,8 @@
         }
         
         // [Lilin Sync Update] Sync categories with Firebase in real-time across all devices!
-        if (window.database && typeof window.database.ref === "function") {
-          window.database.ref("erp_db_categories").on("value", (snapshot) => {
+        if (typeof database !== "undefined" && database.ref) {
+          database.ref("erp_db_categories").on("value", (snapshot) => {
             const data = snapshot.val();
             if (data && Array.isArray(data)) {
               localCategories = data;
@@ -5170,8 +5170,8 @@
 
       function saveCategories() {
         localStorage.setItem("thep_categories", JSON.stringify(localCategories));
-        if (window.database && typeof window.database.ref === "function") {
-          window.database.ref("erp_db_categories").set(localCategories);
+        if (typeof database !== "undefined" && database.ref) {
+          database.ref("erp_db_categories").set(localCategories);
         }
       }
 
