@@ -5149,6 +5149,23 @@
             localCategories = [];
           }
         }
+        
+        // [Lilin Sync Update] Sync categories with Firebase in real-time across all devices!
+        if (window.database && typeof window.database.ref === "function") {
+          window.database.ref("erp_db_categories").on("value", (snapshot) => {
+            const data = snapshot.val();
+            if (data && Array.isArray(data)) {
+              localCategories = data;
+              localStorage.setItem("thep_categories", JSON.stringify(localCategories));
+              updateCategoryDropdowns();
+              
+              const catManagerModal = document.getElementById("category-manager-modal");
+              if (catManagerModal && catManagerModal.style.display === "flex") {
+                 renderCategoryList();
+              }
+            }
+          });
+        }
       }
 
       function saveCategories() {
