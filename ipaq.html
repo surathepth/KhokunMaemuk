@@ -528,7 +528,7 @@
                     for (var key in data) {
                         if (data.hasOwnProperty(key)) {
                             var p = data[key];
-                            if (!p.category) p.category = "ทั่วไป";
+                            if (!p.category || typeof p.category !== "string" || p.category.trim() === "" || p.category === "-") p.category = "ทั่วไป";
                             p.id = p.id || key;
                             allProducts.push(p);
                         }
@@ -556,7 +556,6 @@
         }
 
         function filterMenu() {
-            currentCategory = "ทั้งหมด";
             renderCategories();
             renderProducts();
         }
@@ -566,8 +565,11 @@
             var html = "";
             for (var i = 0; i < allProducts.length; i++) {
                 var p = allProducts[i];
+                if (searchTxt) {
+                if (p.name.toLowerCase().indexOf(searchTxt) === -1) continue;
+            } else {
                 if (currentCategory !== "ทั้งหมด" && p.category !== currentCategory) continue;
-                if (searchTxt && p.name.toLowerCase().indexOf(searchTxt) === -1) continue;
+            }
 
                 var bgImg = (p.image && p.image.indexOf('http') === 0) ? p.image : 'default_beef.jpg';
                 var itemCode = p.barcode || p.id;

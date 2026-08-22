@@ -271,9 +271,7 @@
                 </div>
                 <!-- ======================================================= -->
                 
-                <select id="category-select" style="width:100%; padding:12px; font-size:16px; border-radius:12px; border:1px solid #ccc; background:#fff; margin-bottom:15px; font-family:'Prompt',sans-serif;" onchange="selectCategory(this.value)">
-                    <option value="ทั้งหมด">ทั้งหมด</option>
-                </select>
+                <div class="category-scroll" id="category-bar"></div>
                 <div class="product-grid" id="product-grid">
                     <!-- สินค้า -->
                 </div>
@@ -560,7 +558,7 @@
                     for (var key in data) {
                         if (data.hasOwnProperty(key)) {
                             var p = data[key];
-                            if (!p.category) p.category = "ทั่วไป";
+                            if (!p.category || typeof p.category !== "string" || p.category.trim() === "" || p.category === "-") p.category = "ทั่วไป";
                             p.id = p.id || key;
                             allProducts.push(p);
                         }
@@ -571,14 +569,15 @@
         }
 
         function renderCategories() {
-            var html = "";
+            var bar = document.getElementById("category-bar");
+            if (!bar) return;
+            var html = '';
             for (var i = 0; i < allCategories.length; i++) {
                 var c = allCategories[i];
-                var sel = (c === currentCategory) ? "selected" : "";
-                html += '<option value="' + c + '" ' + sel + '>' + c + '</option>';
+                var active = (c === currentCategory) ? " active" : "";
+                html += '<button class="category-btn' + active + '" onclick="selectCategory(\'' + c + '\')">' + c + '</button>';
             }
-            var catSel = document.getElementById("category-select");
-            if (catSel) catSel.innerHTML = html;
+            bar.innerHTML = html;
         }
 
         function selectCategory(cat) {
@@ -589,7 +588,6 @@
         }
 
         function filterMenu() {
-            currentCategory = "ทั้งหมด";
             renderCategories();
             renderProducts();
         }

@@ -259,7 +259,8 @@
                 for(let key in db) {
                     let p = db[key];
                     allProducts.push(p);
-                    if(p.category && p.category !== '-') {
+                    if (!p.category || typeof p.category !== 'string' || p.category.trim() === '' || p.category === '-') p.category = 'ทั่วไป';
+                    if(p.category) {
                         cats.add(p.category);
                     }
                 }
