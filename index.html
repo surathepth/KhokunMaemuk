@@ -5129,8 +5129,16 @@
         if (typeof database !== "undefined" && database.ref) {
           database.ref("erp_db_categories").on("value", (snapshot) => {
             const data = snapshot.val();
-            if (data && Array.isArray(data)) {
-              localCategories = data;
+            let parsedCategories = [];
+            if (Array.isArray(data)) {
+                parsedCategories = data;
+            } else if (data && typeof data === 'object') {
+                parsedCategories = Object.values(data);
+            }
+            parsedCategories = parsedCategories.filter(c => c != null && c.toString().trim() !== "");
+
+            if (parsedCategories.length > 0) {
+              localCategories = parsedCategories;
               localStorage.setItem("thep_categories", JSON.stringify(localCategories));
               updateCategoryDropdowns();
               

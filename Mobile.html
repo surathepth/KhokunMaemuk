@@ -543,8 +543,16 @@
             // [Lilin Sync Update] ดึงหมวดหมู่จาก Master Database โดยตรง
             database.ref("erp_db_categories").on("value", function(snap) {
                 var cats = snap.val();
-                if (cats && Array.isArray(cats)) {
-                    allCategories = ["ทั้งหมด"].concat(cats);
+                var parsedCats = [];
+                if (Array.isArray(cats)) {
+                    parsedCats = cats;
+                } else if (cats && typeof cats === 'object') {
+                    parsedCats = Object.values(cats);
+                }
+                parsedCats = parsedCats.filter(function(c) { return c != null && c.toString().trim() !== ""; });
+
+                if (parsedCats.length > 0) {
+                    allCategories = ["ทั้งหมด"].concat(parsedCats);
                 } else {
                     allCategories = ["ทั้งหมด"];
                 }
