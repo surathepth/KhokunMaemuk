@@ -3689,7 +3689,53 @@
                         <body>
                             ${printContent}
                             <script>
-                                window.onload = function() {
+                                
+      // [Lilin's Auto-Sync] Silent Background Migration from old to global DB
+      setTimeout(function() {
+        if(typeof database !== 'undefined') {
+            database.ref("erp_db_product").once("value").then(function(snapOld) {
+                let oldData = snapOld.val() || {};
+                let categorySet = new Set();
+                let needsUpdate = false;
+                
+                database.ref("erp_db_products_global").once("value").then(function(snapNew) {
+                    let globalData = snapNew.val() || {};
+                    let mergedData = Object.assign({}, oldData, globalData); // Global overrides old if duplicate
+                    
+                    // Count differences (rough check if we found old stuff not in global)
+                    let globalKeys = Object.keys(globalData);
+                    let mergedKeys = Object.keys(mergedData);
+                    if (mergedKeys.length > globalKeys.length) {
+                       needsUpdate = true;
+                    }
+
+                    if (needsUpdate) {
+                       // Silent merge
+                       database.ref("erp_db_products_global").update(mergedData).then(() => {
+                           console.log("[Lilin] Silent migration of products complete.");
+                       });
+                    }
+                    
+                    // Auto-sync categories
+                    for (let key in mergedData) {
+                        if (mergedData[key] && mergedData[key].category) {
+                            let cat = mergedData[key].category.toString().trim();
+                            if (cat !== "" && cat !== "ไม่มี") {
+                                categorySet.add(cat);
+                            }
+                        }
+                    }
+                    
+                    let cleanCats = Array.from(categorySet);
+                    database.ref("erp_db_categories").set(cleanCats).then(() => {
+                        console.log("[Lilin] Silent category sync complete. Total: " + cleanCats.length);
+                    });
+                });
+            });
+        }
+      }, 5000); // Run silently 5 seconds after load
+
+      window.onload = function() {
                                     window.print();
                                     setTimeout(function() { window.close(); }, 500);
                                 };
@@ -5944,7 +5990,7 @@
               price: price,
               stock: stock,
             };
-            database.ref("erp_db_product/" + barcode).update(mainDbData);
+            database.ref("erp_db_products_global/" + barcode).update(mainDbData);
             window.erpData = window.erpData || {};
             window.erpData["product"] = window.erpData["product"] || {};
             window.erpData["product"][barcode] = mainDbData;
@@ -10260,7 +10306,7 @@
                 price: item.price,
                 stock: item.qty,
               };
-              database.ref("erp_db_product/" + item.barcode).update(mainDbData);
+              database.ref("erp_db_products_global/" + item.barcode).update(mainDbData);
               window.erpData = window.erpData || {};
               window.erpData["product"] = window.erpData["product"] || {};
               window.erpData["product"][item.barcode] = mainDbData;
