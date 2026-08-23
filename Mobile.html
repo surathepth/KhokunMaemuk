@@ -559,7 +559,7 @@
                 renderCategories();
             });
 
-            database.ref("erp_db_products_global").on("value", function(snapshot) {
+            database.ref("erp_db_product").on("value", function(snapshot) {
                 allProducts = [];
                 if (snapshot.exists()) {
                     var data = snapshot.val();
