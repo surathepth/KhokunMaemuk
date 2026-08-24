@@ -16004,7 +16004,7 @@ function printAllQRCodes() {
         }
         if(!confirm('✨ ลิลินพร้อมแล้วค่ะ! บอสต้องการให้ลิลินกวาดล้างและดึงเมนูเครื่องดื่มที่ตกหล่นกลับบ้านตอนนี้เลยใช่ไหมคะ?')) return;
         
-        const ref = database.ref("erp_db_product");
+        const ref = database.ref("erp_db_products_global");
         ref.once("value").then(snap => {
             let data = snap.val();
             if(!data) {
