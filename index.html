@@ -8875,11 +8875,21 @@
               let rawCategory = (document.getElementById("prod-category").value || "").trim();
               if (!rawCategory || rawCategory === "-") rawCategory = "ทั่วไป";
               
-              // [Lilin's Category Shield]
+              // [Lilin's Category Shield] Group 1-4
               if (rawCategory === "ประเภทเครื่องดื่ม" || rawCategory === "เครื่องดื่ม") rawCategory = "เครื่องดื่ม";
               else if (rawCategory === "ปลาแม่น้ำโขง" || rawCategory === "ประเภทปลาแม่น้ำโขง") rawCategory = "ปลาแม่น้ำโขง";
               else if (rawCategory === "จานด่วน/ราดข้าว" || rawCategory === "อาหารจานด่วน ราดข้าว" || rawCategory === "อาหารจานเดียว") rawCategory = "อาหารจานด่วน";
               else if (rawCategory === "ทั่วไป" || rawCategory === "อื่นๆ") rawCategory = "ทั่วไป";
+              
+              // [Lilin's Smart Filter: Drink Menu Rescue]
+              if (rawCategory === "ทั่วไป") {
+                  let pName = (document.getElementById("prod-name").value || "").trim();
+                  let safeDrinkKeywords = ["โค้ก", "เป๊ปซี่", "สไปรท์", "แฟนต้า", "เอส", "น้ำเปล่า", "น้ำแข็ง", "โซดา", "เบียร์", "ช้าง", "สิงห์", "ลีโอ", "ไฮเนเก้น", "ชาเขียว", "ชาเย็น", "กาแฟ", "เหล้า", "รีเจนซี่", "แสงโสม", "หงส์ทอง", "ไวน์", "น้ำปั่น", "น้ำส้ม", "โออิชิ", "น้ำอัดลม", "เครื่องดื่ม", "ชามะนาว", "ชาดำเย็น", "ชานม", "นมสด", "สเมอร์นอฟ", "ช้างโคลด์"];
+                  let isDrink = safeDrinkKeywords.some(kw => pName.includes(kw));
+                  if (isDrink) {
+                      rawCategory = "เครื่องดื่ม";
+                  }
+              }
               
               return rawCategory;
             })(),
@@ -15992,7 +16002,7 @@ function printAllQRCodes() {
             alert('❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณารอโหลดสักครู่แล้วลองใหม่ค่ะ');
             return;
         }
-        if(!confirm('✨ ลิลินพร้อมแล้วค่ะ! บอสต้องการให้ลิลินจัดระเบียบหมวดหมู่เมนูอาหารทั้งหมดตอนนี้เลยใช่ไหมคะ?')) return;
+        if(!confirm('✨ ลิลินพร้อมแล้วค่ะ! บอสต้องการให้ลิลินกวาดล้างและดึงเมนูเครื่องดื่มที่ตกหล่นกลับบ้านตอนนี้เลยใช่ไหมคะ?')) return;
         
         const ref = database.ref("erp_db_product");
         ref.once("value").then(snap => {
@@ -16004,17 +16014,28 @@ function printAllQRCodes() {
             
             let updateCount = 0;
             let updates = {};
+            let safeDrinkKeywords = ["โค้ก", "เป๊ปซี่", "สไปรท์", "แฟนต้า", "เอส", "น้ำเปล่า", "น้ำแข็ง", "โซดา", "เบียร์", "ช้าง", "สิงห์", "ลีโอ", "ไฮเนเก้น", "ชาเขียว", "ชาเย็น", "กาแฟ", "เหล้า", "รีเจนซี่", "แสงโสม", "หงส์ทอง", "ไวน์", "น้ำปั่น", "น้ำส้ม", "โออิชิ", "น้ำอัดลม", "เครื่องดื่ม", "ชามะนาว", "ชาดำเย็น", "ชานม", "นมสด", "สเมอร์นอฟ", "ช้างโคลด์"];
             
             for(let key in data) {
                 let p = data[key];
                 let rawCategory = (p.category || "").trim();
+                let pName = (p.name || p.productName || "").trim();
                 let newCategory = rawCategory;
                 
+                // 1. หมวดหมู่ซ้ำซ้อน
                 if (!newCategory || newCategory === "-") newCategory = "ทั่วไป";
                 if (newCategory === "ประเภทเครื่องดื่ม" || newCategory === "เครื่องดื่ม") newCategory = "เครื่องดื่ม";
                 else if (newCategory === "ปลาแม่น้ำโขง" || newCategory === "ประเภทปลาแม่น้ำโขง") newCategory = "ปลาแม่น้ำโขง";
                 else if (newCategory === "จานด่วน/ราดข้าว" || newCategory === "อาหารจานด่วน ราดข้าว" || newCategory === "อาหารจานเดียว") newCategory = "อาหารจานด่วน";
                 else if (newCategory === "ทั่วไป" || newCategory === "อื่นๆ") newCategory = "ทั่วไป";
+                
+                // 2. ดึงเมนูเครื่องดื่มหลงทางกลับบ้าน (Rescue)
+                if (newCategory !== "เครื่องดื่ม") {
+                    let isDrink = safeDrinkKeywords.some(kw => pName.includes(kw));
+                    if (isDrink) {
+                        newCategory = "เครื่องดื่ม";
+                    }
+                }
                 
                 if(newCategory !== rawCategory) {
                     updates[key + "/category"] = newCategory;
@@ -16024,13 +16045,13 @@ function printAllQRCodes() {
             
             if(updateCount > 0) {
                 ref.update(updates).then(() => {
-                    alert('✅ ลิลินจัดระเบียบหมวดหมู่ให้เรียบร้อยแล้วค่ะ! แก้ไขไปทั้งหมด ' + updateCount + ' รายการ\n\nบอสสามารถเปิดหน้าจอคิวอาร์โค้ดโต๊ะเพื่อดูผลลัพธ์ได้เลยค่ะ!');
+                    alert('✅ ลิลินดึงเมนูเครื่องดื่มกลับบ้านเรียบร้อยแล้วค่ะ! แก้ไขและช่วยเหลือไปทั้งหมด ' + updateCount + ' รายการ\n\nบอสสามารถเปิดหน้าจอคิวอาร์โค้ดเพื่อดูผลลัพธ์ได้เลยค่ะ!');
                     document.getElementById('lilin-magic-btn-container').style.display='none';
                 }).catch(err => {
                     alert('❌ เกิดข้อผิดพลาด: ' + err.message);
                 });
             } else {
-                alert('✨ ข้อมูลเป็นระเบียบเรียบร้อยอยู่แล้วค่ะ ไม่พบหมวดหมู่ที่ต้องแก้ไข');
+                alert('✨ เมนูเครื่องดื่มทั้งหมดอยู่ในบ้านอย่างเป็นระเบียบอยู่แล้วค่ะ ไม่พบเมนูหลงทาง');
                 document.getElementById('lilin-magic-btn-container').style.display='none';
             }
         });
