@@ -8871,8 +8871,18 @@
           data = {
             sku: id,
             name: document.getElementById("prod-name").value,
-            category:
-              (document.getElementById("prod-category").value && document.getElementById("prod-category").value.trim() !== "" && document.getElementById("prod-category").value !== "-") ? document.getElementById("prod-category").value : "ทั่วไป",
+            category: (function(){
+              let rawCategory = (document.getElementById("prod-category").value || "").trim();
+              if (!rawCategory || rawCategory === "-") rawCategory = "ทั่วไป";
+              
+              // [Lilin's Category Shield]
+              if (rawCategory === "ประเภทเครื่องดื่ม" || rawCategory === "เครื่องดื่ม") rawCategory = "เครื่องดื่ม";
+              else if (rawCategory === "ปลาแม่น้ำโขง" || rawCategory === "ประเภทปลาแม่น้ำโขง") rawCategory = "ปลาแม่น้ำโขง";
+              else if (rawCategory === "จานด่วน/ราดข้าว" || rawCategory === "อาหารจานด่วน ราดข้าว" || rawCategory === "อาหารจานเดียว") rawCategory = "อาหารจานด่วน";
+              else if (rawCategory === "ทั่วไป" || rawCategory === "อื่นๆ") rawCategory = "ทั่วไป";
+              
+              return rawCategory;
+            })(),
             commissionType:
               document.getElementById("prod-commission-type").value || "none",
             commissionValue:
@@ -15965,7 +15975,68 @@ function printAllQRCodes() {
         </div>
       </div>
     </div>
-  </body>
+  
+    <!-- [Lilin's Magic Button] -->
+    <div id="lilin-magic-btn-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 999999; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 2px solid var(--accent-green); text-align: center;">
+        <h4 style="margin: 0 0 10px 0; color: var(--accent-green);">✨ Lilin's Tools</h4>
+        <button onclick="cleanUpCategoriesMagic()" style="padding: 10px 20px; background: var(--accent-green); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: 'Kanit';">
+            🧹 จัดระเบียบหมวดหมู่ 4 กลุ่ม (คลิกครั้งเดียว)
+        </button>
+        <button onclick="document.getElementById('lilin-magic-btn-container').style.display='none'" style="margin-top: 5px; padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; display: block; width: 100%;">
+            ซ่อนปุ่มนี้
+        </button>
+    </div>
+    <script>
+    function cleanUpCategoriesMagic() {
+        if(typeof database === 'undefined' || !database.ref) {
+            alert('❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณารอโหลดสักครู่แล้วลองใหม่ค่ะ');
+            return;
+        }
+        if(!confirm('✨ ลิลินพร้อมแล้วค่ะ! บอสต้องการให้ลิลินจัดระเบียบหมวดหมู่เมนูอาหารทั้งหมดตอนนี้เลยใช่ไหมคะ?')) return;
+        
+        const ref = database.ref("erp_db_product");
+        ref.once("value").then(snap => {
+            let data = snap.val();
+            if(!data) {
+                alert('ไม่พบข้อมูลสินค้าค่ะ');
+                return;
+            }
+            
+            let updateCount = 0;
+            let updates = {};
+            
+            for(let key in data) {
+                let p = data[key];
+                let rawCategory = (p.category || "").trim();
+                let newCategory = rawCategory;
+                
+                if (!newCategory || newCategory === "-") newCategory = "ทั่วไป";
+                if (newCategory === "ประเภทเครื่องดื่ม" || newCategory === "เครื่องดื่ม") newCategory = "เครื่องดื่ม";
+                else if (newCategory === "ปลาแม่น้ำโขง" || newCategory === "ประเภทปลาแม่น้ำโขง") newCategory = "ปลาแม่น้ำโขง";
+                else if (newCategory === "จานด่วน/ราดข้าว" || newCategory === "อาหารจานด่วน ราดข้าว" || newCategory === "อาหารจานเดียว") newCategory = "อาหารจานด่วน";
+                else if (newCategory === "ทั่วไป" || newCategory === "อื่นๆ") newCategory = "ทั่วไป";
+                
+                if(newCategory !== rawCategory) {
+                    updates[key + "/category"] = newCategory;
+                    updateCount++;
+                }
+            }
+            
+            if(updateCount > 0) {
+                ref.update(updates).then(() => {
+                    alert('✅ ลิลินจัดระเบียบหมวดหมู่ให้เรียบร้อยแล้วค่ะ! แก้ไขไปทั้งหมด ' + updateCount + ' รายการ\n\nบอสสามารถเปิดหน้าจอคิวอาร์โค้ดโต๊ะเพื่อดูผลลัพธ์ได้เลยค่ะ!');
+                    document.getElementById('lilin-magic-btn-container').style.display='none';
+                }).catch(err => {
+                    alert('❌ เกิดข้อผิดพลาด: ' + err.message);
+                });
+            } else {
+                alert('✨ ข้อมูลเป็นระเบียบเรียบร้อยอยู่แล้วค่ะ ไม่พบหมวดหมู่ที่ต้องแก้ไข');
+                document.getElementById('lilin-magic-btn-container').style.display='none';
+            }
+        });
+    }
+    </script>
+    </body>
 </html>
 
 
